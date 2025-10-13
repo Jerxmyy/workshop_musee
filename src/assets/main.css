@@ -1,12 +1,26 @@
 @import './base.css';
 
-#app {
-  width: 100vw;
-  height: 100vh;
+* {
   margin: 0;
   padding: 0;
-  font-weight: normal;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
   overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  font-weight: normal;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #333;
 }
 
 a,
@@ -23,26 +37,60 @@ a,
   }
 }
 
-/* Reset pour le body */
-body {
-  margin: 0;
-  padding: 0;
-  width: 100vw;
+/* Styles pour l'interface responsive */
+.app-container {
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-/* Styles responsive pour l'application */
-@media (min-width: 1024px) {
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+.results-section {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .header-filters {
+    padding: 1rem;
+  }
+
+  .results-section {
+    padding: 1rem;
   }
 }
 
-@media (max-width: 1023px) {
-  #app {
-    display: flex;
-    flex-direction: column;
+@media (max-width: 480px) {
+  .header {
+    padding: 0.5rem;
+  }
+
+  .header-filters {
+    padding: 0.75rem;
+  }
+
+  .results-section {
+    padding: 0.5rem;
   }
 }

@@ -1,164 +1,119 @@
 <template>
   <div class="museum-detail">
+    <!-- Bouton retour -->
     <div class="detail-header">
-      <button @click="goBack" class="back-button">← Retour à la liste</button>
-      <div class="header-actions">
-        <button @click="toggleFavorite" :class="{ favorited: isFavorited }" class="favorite-btn">
-          {{ isFavorited ? '❤️ Favori' : '🤍 Ajouter aux favoris' }}
-        </button>
+      <button @click="goBack" class="back-btn">
+        <span class="back-icon">←</span>
+        Retour à la liste
+      </button>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="detail-content">
+      <!-- Informations du musée -->
+      <div class="museum-info">
+        <div class="museum-hero">
+          <div class="museum-image-large">
+            <img v-if="museum.image" :src="museum.image" :alt="museum.name" class="hero-image" />
+            <div v-else class="placeholder-hero">
+              <span class="placeholder-icon-large">🏛️</span>
+            </div>
+          </div>
+
+          <div class="museum-header">
+            <h1 class="museum-title">{{ museum.name }}</h1>
+            <p class="museum-subtitle">
+              <span class="location-icon">📍</span>
+              {{ museum.address }}, {{ museum.city }}, {{ museum.region }}
+            </p>
+
+            <div class="museum-badges">
+              <span v-if="museum.freeEntry" class="badge free">🆓 Entrée gratuite</span>
+              <span v-if="museum.wheelchairAccessible" class="badge accessible">♿ Accessible</span>
+              <span v-if="museum.rating" class="badge rating">⭐ {{ museum.rating }}/5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="museum-description-section">
+          <h2 class="section-title">Description</h2>
+          <p class="museum-description">{{ museum.description }}</p>
+        </div>
+
+        <!-- Informations pratiques -->
+        <div class="practical-info">
+          <h2 class="section-title">Informations pratiques</h2>
+
+          <div class="info-grid">
+            <div class="info-item" v-if="museum.openingHours">
+              <h3 class="info-label">Horaires</h3>
+              <p class="info-value">{{ museum.openingHours }}</p>
+            </div>
+
+            <div class="info-item" v-if="museum.phone">
+              <h3 class="info-label">Téléphone</h3>
+              <p class="info-value">
+                <a :href="`tel:${museum.phone}`" class="info-link">{{ museum.phone }}</a>
+              </p>
+            </div>
+
+            <div class="info-item" v-if="museum.website">
+              <h3 class="info-label">Site web</h3>
+              <p class="info-value">
+                <a :href="museum.website" target="_blank" class="info-link">
+                  {{ museum.website }}
+                  <span class="external-icon">↗</span>
+                </a>
+              </p>
+            </div>
+
+            <div class="info-item" v-if="museum.email">
+              <h3 class="info-label">Email</h3>
+              <p class="info-value">
+                <a :href="`mailto:${museum.email}`" class="info-link">{{ museum.email }}</a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thématiques -->
+        <div class="themes-section" v-if="museum.themes && museum.themes.length">
+          <h2 class="section-title">Thématiques</h2>
+          <div class="themes-list">
+            <span v-for="theme in museum.themes" :key="theme" class="theme-tag-large">
+              {{ theme }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte -->
+      <div class="museum-map">
+        <h2 class="section-title">Localisation</h2>
+        <div id="map" class="map-container"></div>
       </div>
     </div>
 
-    <div class="detail-content">
-      <div class="museum-hero">
-        <div class="museum-image-large">
-          <div class="placeholder-image">
-            <span class="museum-icon">🏛️</span>
-          </div>
-        </div>
+    <!-- Actions -->
+    <div class="detail-actions">
+      <button class="favorite-btn" @click="toggleFavorite">
+        <span class="favorite-icon">{{ isFavorite ? '❤️' : '🤍' }}</span>
+        {{ isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+      </button>
 
-        <div class="museum-basic-info">
-          <h1 class="museum-title">{{ museum.name }}</h1>
-          <div class="museum-location">
-            <span class="city">{{ museum.city }}</span>
-            <span class="region">{{ museum.region }}</span>
-          </div>
-          <div class="museum-theme">{{ museum.theme }}</div>
-        </div>
-      </div>
-
-      <div class="detail-sections">
-        <div class="detail-section">
-          <h3>Informations générales</h3>
-          <div class="info-grid">
-            <div class="info-item">
-              <label>Nom officiel</label>
-              <span>{{ museum.name }}</span>
-            </div>
-            <div class="info-item">
-              <label>Ville</label>
-              <span>{{ museum.city }}</span>
-            </div>
-            <div class="info-item">
-              <label>Région</label>
-              <span>{{ museum.region }}</span>
-            </div>
-            <div class="info-item">
-              <label>Thématique</label>
-              <span>{{ museum.theme }}</span>
-            </div>
-            <div class="info-item">
-              <label>Coordonnées</label>
-              <span>{{
-                museum.coordinates
-                  ? `${museum.coordinates[0]}, ${museum.coordinates[1]}`
-                  : 'Non disponibles'
-              }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-section">
-          <h3>Description</h3>
-          <p class="museum-description">
-            {{ museum.description || 'Aucune description disponible pour ce musée.' }}
-          </p>
-        </div>
-
-        <div class="detail-section">
-          <h3>Horaires d'ouverture</h3>
-          <div class="opening-hours">
-            <div class="hours-item">
-              <span class="day">Lundi</span>
-              <span class="hours">{{ museum.openingHours?.monday || 'Fermé' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Mardi</span>
-              <span class="hours">{{ museum.openingHours?.tuesday || '9h00 - 18h00' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Mercredi</span>
-              <span class="hours">{{ museum.openingHours?.wednesday || '9h00 - 18h00' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Jeudi</span>
-              <span class="hours">{{ museum.openingHours?.thursday || '9h00 - 18h00' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Vendredi</span>
-              <span class="hours">{{ museum.openingHours?.friday || '9h00 - 18h00' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Samedi</span>
-              <span class="hours">{{ museum.openingHours?.saturday || '9h00 - 18h00' }}</span>
-            </div>
-            <div class="hours-item">
-              <span class="day">Dimanche</span>
-              <span class="hours">{{ museum.openingHours?.sunday || '9h00 - 18h00' }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-section">
-          <h3>Tarifs</h3>
-          <div class="pricing-info">
-            <div class="price-item">
-              <span class="price-label">Plein tarif</span>
-              <span class="price-value">{{ museum.pricing?.fullPrice || '15€' }}</span>
-            </div>
-            <div class="price-item">
-              <span class="price-label">Tarif réduit</span>
-              <span class="price-value">{{ museum.pricing?.reducedPrice || '10€' }}</span>
-            </div>
-            <div class="price-item">
-              <span class="price-label">Gratuit</span>
-              <span class="price-value">{{
-                museum.pricing?.free || 'Premier dimanche du mois'
-              }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-section">
-          <h3>Contact</h3>
-          <div class="contact-info">
-            <div class="contact-item">
-              <label>Adresse</label>
-              <span>{{ museum.address || 'Adresse non disponible' }}</span>
-            </div>
-            <div class="contact-item">
-              <label>Téléphone</label>
-              <span>{{ museum.phone || 'Non disponible' }}</span>
-            </div>
-            <div class="contact-item">
-              <label>Email</label>
-              <span>{{ museum.email || 'Non disponible' }}</span>
-            </div>
-            <div class="contact-item">
-              <label>Site web</label>
-              <a v-if="museum.website" :href="museum.website" target="_blank" class="website-link">
-                {{ museum.website }}
-              </a>
-              <span v-else>Non disponible</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-section" v-if="museum.coordinates && museum.coordinates.length === 2">
-          <h3>Localisation</h3>
-          <div class="map-container">
-            <div ref="mapElement" class="map"></div>
-          </div>
-        </div>
-      </div>
+      <button class="share-btn" @click="shareMuseum">
+        <span class="share-icon">📤</span>
+        Partager
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useMuseumStore } from '../stores/museum'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 
 const props = defineProps({
   museum: {
@@ -169,82 +124,74 @@ const props = defineProps({
 
 const emit = defineEmits(['back'])
 
-const isFavorited = ref(false)
-const mapElement = ref(null)
-const map = ref(null)
-
-// Configuration des icônes Leaflet
-const createIcon = () => {
-  return L.divIcon({
-    className: 'custom-marker',
-    html: `<div class="marker-icon selected">🏛️</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30],
-  })
-}
-
-const initMap = () => {
-  if (!mapElement.value || !props.museum.coordinates) return
-
-  // Initialiser la carte centrée sur le musée
-  map.value = L.map(mapElement.value, {
-    zoomControl: true,
-  }).setView(props.museum.coordinates, 15)
-
-  // Ajouter la couche de tuiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-  }).addTo(map.value)
-
-  // Ajouter le marqueur du musée
-  const marker = L.marker(props.museum.coordinates, {
-    icon: createIcon(),
-  }).addTo(map.value).bindPopup(`
-      <div class="popup-content">
-        <h4>${props.museum.name}</h4>
-        <p>${props.museum.city}, ${props.museum.region}</p>
-        <p><strong>Thème:</strong> ${props.museum.theme}</p>
-      </div>
-    `)
-
-  // Ouvrir automatiquement le popup
-  marker.openPopup()
-}
+const museumStore = useMuseumStore()
+const isFavorite = computed(() => museumStore.isFavorite(props.museum.id))
+let map = null
 
 const goBack = () => {
   emit('back')
 }
 
 const toggleFavorite = () => {
-  isFavorited.value = !isFavorited.value
-  // Ici on pourrait sauvegarder en base de données
+  museumStore.toggleFavorite(props.museum.id)
 }
 
-// Watcher pour réinitialiser la carte si le musée change
-watch(
-  () => props.museum,
-  () => {
-    if (map.value) {
-      map.value.remove()
-      map.value = null
+const shareMuseum = async () => {
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: props.museum.name,
+        text: `Découvrez ${props.museum.name}`,
+        url: window.location.href,
+      })
+    } catch (err) {
+      console.log('Erreur lors du partage:', err)
     }
-    nextTick(() => {
-      initMap()
-    })
-  },
-  { deep: true },
-)
+  } else {
+    // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+    navigator.clipboard.writeText(window.location.href)
+    alert('Lien copié dans le presse-papiers!')
+  }
+}
+
+const initMap = async () => {
+  await nextTick()
+
+  if (!props.museum.coordinates) {
+    console.warn('Aucune coordonnée disponible pour ce musée')
+    return
+  }
+
+  // Configuration de Leaflet pour éviter les problèmes d'icônes
+  delete L.Icon.Default.prototype._getIconUrl
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  })
+
+  // Initialisation de la carte
+  map = L.map('map').setView([props.museum.coordinates.lat, props.museum.coordinates.lng], 15)
+
+  // Ajout de la couche de tuiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+  }).addTo(map)
+
+  // Ajout du marqueur
+  L.marker([props.museum.coordinates.lat, props.museum.coordinates.lng])
+    .addTo(map)
+    .bindPopup(`<b>${props.museum.name}</b><br>${props.museum.address}`)
+    .openPopup()
+}
 
 onMounted(() => {
-  nextTick(() => {
-    initMap()
-  })
+  initMap()
 })
 
 onUnmounted(() => {
-  if (map.value) {
-    map.value.remove()
+  if (map) {
+    map.remove()
   }
 })
 </script>
@@ -255,98 +202,94 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem;
+  border-bottom: 1px solid #ecf0f1;
   background: #f8f9fa;
 }
 
-.back-button {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-}
-
-.back-button:hover {
-  background: #5a6268;
-}
-
-.header-actions {
+.back-btn {
   display: flex;
-  gap: 1rem;
-}
-
-.favorite-btn {
-  background: #dc3545;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #3498db;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-weight: 500;
   transition: all 0.3s ease;
 }
 
-.favorite-btn.favorited {
-  background: #28a745;
+.back-btn:hover {
+  background: #2980b9;
+  transform: translateX(-2px);
 }
 
-.favorite-btn:hover {
-  opacity: 0.9;
+.back-icon {
+  font-size: 1.2rem;
 }
 
 .detail-content {
   flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.museum-info {
+  flex: 1;
+  padding: 2rem;
   overflow-y: auto;
 }
 
-.museum-hero {
-  display: flex;
-  gap: 2rem;
+.museum-map {
+  width: 400px;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-bottom: 1px solid #dee2e6;
+  border-left: 1px solid #ecf0f1;
+  display: flex;
+  flex-direction: column;
+}
+
+.museum-hero {
+  margin-bottom: 2rem;
 }
 
 .museum-image-large {
-  width: 200px;
-  height: 200px;
-  background: white;
+  height: 300px;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
 }
 
-.placeholder-image {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hero-image {
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
-.museum-icon {
-  font-size: 4rem;
-}
-
-.museum-basic-info {
-  flex: 1;
+.placeholder-hero {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
+}
+
+.placeholder-icon-large {
+  font-size: 4rem;
+  color: white;
+  opacity: 0.7;
+}
+
+.museum-header {
+  text-align: center;
 }
 
 .museum-title {
@@ -357,258 +300,221 @@ onUnmounted(() => {
   line-height: 1.2;
 }
 
-.museum-location {
-  margin-bottom: 1rem;
-  font-size: 1.1rem;
-  color: #6c757d;
+.museum-subtitle {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin: 0 0 1.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.city {
-  font-weight: 600;
-  color: #495057;
+.museum-badges {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.region {
-  margin-left: 0.5rem;
-  color: #adb5bd;
-}
-
-.museum-theme {
-  background: #007bff;
-  color: white;
+.badge {
   padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  border-radius: 25px;
   font-weight: 500;
-  display: inline-block;
-  width: fit-content;
+  font-size: 0.9rem;
 }
 
-.detail-sections {
-  padding: 2rem;
+.badge.free {
+  background: #d5f4e6;
+  color: #27ae60;
 }
 
-.detail-section {
-  margin-bottom: 2rem;
+.badge.accessible {
+  background: #e8f4fd;
+  color: #2980b9;
 }
 
-.detail-section h3 {
+.badge.rating {
+  background: #fef5e7;
+  color: #f39c12;
+}
+
+.section-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: #2c3e50;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.museum-description-section {
+  margin-bottom: 2rem;
+}
+
+.museum-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #5d6d7e;
+  margin: 0;
+}
+
+.practical-info {
+  margin-bottom: 2rem;
 }
 
 .info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .info-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.info-item label {
-  font-weight: 600;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.info-item span {
-  color: #495057;
-}
-
-.museum-description {
-  line-height: 1.6;
-  color: #495057;
-  font-size: 1rem;
-}
-
-.opening-hours {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.hours-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #f8f9fa;
-}
-
-.day {
-  font-weight: 500;
-  color: #495057;
-  min-width: 80px;
-}
-
-.hours {
-  color: #6c757d;
-}
-
-.pricing-info {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.price-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
+  padding: 1rem;
   background: #f8f9fa;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
-.price-label {
-  font-weight: 500;
-  color: #495057;
-}
-
-.price-value {
+.info-label {
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #007bff;
+  color: #7f8c8d;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.contact-info {
-  display: grid;
-  gap: 1rem;
+.info-value {
+  font-size: 1rem;
+  color: #2c3e50;
+  margin: 0;
 }
 
-.contact-item {
+.info-link {
+  color: #3498db;
+  text-decoration: none;
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 0.25rem;
 }
 
-.contact-item label {
-  font-weight: 600;
-  color: #6c757d;
-  font-size: 0.9rem;
-}
-
-.contact-item span {
-  color: #495057;
-}
-
-.website-link {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.website-link:hover {
+.info-link:hover {
   text-decoration: underline;
 }
 
-/* Styles pour la carte */
+.external-icon {
+  font-size: 0.8rem;
+}
+
+.themes-section {
+  margin-bottom: 2rem;
+}
+
+.themes-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.theme-tag-large {
+  background: #e8f4fd;
+  color: #2980b9;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
 .map-container {
-  width: 100%;
-  height: 400px;
+  height: 300px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 1rem;
+  border: 1px solid #e1e8ed;
 }
 
-.map {
-  width: 100%;
-  height: 100%;
+.detail-actions {
+  padding: 1.5rem;
+  border-top: 1px solid #ecf0f1;
+  background: #f8f9fa;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
-/* Styles pour les marqueurs personnalisés */
-:global(.custom-marker) {
-  background: transparent;
+.favorite-btn,
+.share-btn {
+  padding: 0.875rem 2rem;
   border: none;
-}
-
-:global(.marker-icon) {
-  width: 30px;
-  height: 30px;
-  background: white;
-  border: 2px solid #007bff;
-  border-radius: 50%;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
+  gap: 0.5rem;
 }
 
-:global(.marker-icon.selected) {
-  background: #007bff;
+.favorite-btn {
+  background: #e74c3c;
   color: white;
-  transform: scale(1.2);
-  z-index: 1000;
 }
 
-/* Styles pour les popups */
-:global(.popup-content) {
-  text-align: center;
-  min-width: 200px;
+.favorite-btn:hover {
+  background: #c0392b;
+  transform: translateY(-1px);
 }
 
-:global(.popup-content h4) {
-  margin: 0 0 8px 0;
-  color: #2c3e50;
-  font-size: 16px;
+.share-btn {
+  background: #3498db;
+  color: white;
 }
 
-:global(.popup-content p) {
-  margin: 4px 0;
-  color: #6c757d;
-  font-size: 14px;
+.share-btn:hover {
+  background: #2980b9;
+  transform: translateY(-1px);
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
-  .museum-hero {
+@media (max-width: 1024px) {
+  .detail-content {
     flex-direction: column;
-    text-align: center;
+  }
+
+  .museum-map {
+    width: 100%;
+    height: 300px;
+    border-left: none;
+    border-top: 1px solid #ecf0f1;
+  }
+}
+
+@media (max-width: 768px) {
+  .museum-info {
     padding: 1.5rem;
   }
 
-  .museum-image-large {
-    width: 150px;
-    height: 150px;
-    margin: 0 auto;
+  .museum-map {
+    padding: 1.5rem;
   }
 
   .museum-title {
     font-size: 2rem;
   }
 
-  .detail-sections {
-    padding: 1.5rem;
-  }
-
   .info-grid {
     grid-template-columns: 1fr;
+  }
+
+  .detail-actions {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .detail-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-  }
-
-  .header-actions {
-    justify-content: center;
-  }
-
-  .museum-hero {
+  .museum-info {
     padding: 1rem;
   }
 
-  .detail-sections {
+  .museum-map {
     padding: 1rem;
   }
 
@@ -616,8 +522,9 @@ onUnmounted(() => {
     font-size: 1.5rem;
   }
 
-  .map-container {
-    height: 300px;
+  .museum-badges {
+    flex-direction: column;
+    align-items: center;
   }
 }
 </style>

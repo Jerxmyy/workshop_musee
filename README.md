@@ -1,32 +1,58 @@
-# Musée de France - Interface de Consultation
+# 🏛️ MuséeExplorer
 
-## Présentation du Projet
+Une application Vue.js moderne et responsive pour découvrir et explorer les trésors culturels de France. MuséeExplorer vous permet de rechercher, filtrer et explorer les musées avec une interface intuitive et des fonctionnalités avancées.
 
-Cette application web permet de consulter la base de données des musées de France via l'API ouverte du Ministère de la Culture. Elle offre une interface responsive qui prend tout l'espace de l'écran et permet de rechercher, filtrer et visualiser les musées avec une carte interactive.
+## ✨ Fonctionnalités
 
-### Fonctionnalités Principales
+### 🔍 Recherche avancée
 
-- **Recherche avancée** : Recherche textuelle, filtrage par thématique, région, ville
-- **Interface responsive** : Adaptation automatique à tous les écrans (desktop, tablette, mobile)
-- **Carte interactive** : Visualisation des musées sur une carte Leaflet
-- **Fiches détaillées** : Affichage complet des informations de chaque musée
-- **Système de favoris** : Sauvegarde des musées préférés en local
-- **Géolocalisation** : Recherche de musées à proximité (à venir)
+- **Recherche textuelle** : Par nom de musée ou description
+- **Filtres géographiques** : Par région et ville
+- **Filtres thématiques** : Art, Histoire, Sciences, Archéologie, etc.
+- **Recherche par localisation** : Utilisation de la géolocalisation
+- **Filtres d'accessibilité** : Entrée gratuite, accessibilité PMR
 
-### Technologies Utilisées
+### 🎨 Interface utilisateur
 
-- **Frontend** : Vue.js 3 avec Composition API
-- **État global** : Pinia pour la gestion d'état
-- **Cartes** : Leaflet pour l'affichage cartographique
-- **HTTP Client** : Axios pour les requêtes API
-- **Build Tool** : Vite
-- **Styling** : CSS3 avec Grid et Flexbox
+- **Design responsive** : Adapté à tous les écrans (mobile, tablette, desktop)
+- **Interface plein écran** : Utilise tout l'espace disponible
+- **Design moderne** : Interface élégante avec dégradés et animations
+- **Navigation intuitive** : Recherche, liste, détails et carte
 
-## Installation et Démarrage
+### 🗺️ Visualisation
+
+- **Liste des musées** : Affichage en grille avec cartes informatives
+- **Fiche détaillée** : Informations complètes sur chaque musée
+- **Carte interactive** : Localisation avec Leaflet
+- **Pagination** : Navigation dans les résultats
+
+### ❤️ Favoris
+
+- **Gestion des favoris** : Ajout/suppression de musées favoris
+- **Persistance** : Sauvegarde dans le localStorage
+- **Partage** : Fonctionnalité de partage des musées
+
+## 🛠️ Technologies utilisées
+
+### Frontend
+
+- **Vue.js 3** : Framework JavaScript réactif
+- **Pinia** : Gestion d'état moderne
+- **Vue Router** : Routage côté client
+- **Axios** : Client HTTP pour les requêtes API
+- **Leaflet** : Cartes interactives
+- **CSS3** : Styles modernes avec Flexbox et Grid
+
+### API
+
+- **API Muséofile** : Base de données des musées de France
+- **OpenStreetMap** : Données cartographiques
+
+## 🚀 Installation et démarrage
 
 ### Prérequis
 
-- Node.js (version 20.19.0 ou supérieure)
+- Node.js 20.19.0 ou supérieur
 - npm ou yarn
 
 ### Installation
@@ -43,9 +69,9 @@ npm install
 npm run dev
 ```
 
-L'application sera accessible à l'adresse `http://localhost:5173`
+L'application sera accessible sur `http://localhost:5173`
 
-### Scripts Disponibles
+### Scripts disponibles
 
 ```bash
 # Développement
@@ -64,239 +90,168 @@ npm run lint
 npm run format
 ```
 
-## Documentation de l'API
-
-### API des Musées de France
-
-L'application consomme l'API ouverte du Ministère de la Culture accessible via `data.culture.gouv.fr`.
-
-#### Endpoints Utilisés
-
-**Base URL** : `https://data.culture.gouv.fr/api/records/1.0/search/`
-
-**Dataset** : `musees-de-france`
-
-#### Requêtes Principales
-
-##### 1. Recherche de Musées
-
-```javascript
-GET /api/records/1.0/search/?dataset=musees-de-france&q={query}&refine={filters}&rows={limit}&start={offset}
-```
-
-**Paramètres :**
-
-- `q` : Requête textuelle (optionnel)
-- `refine` : Filtres (thème, région, ville) séparés par `AND`
-- `rows` : Nombre de résultats (max 100)
-- `start` : Décalage pour la pagination
-- `facet` : Facettes à récupérer (thème, région, ville, département)
-
-**Exemple :**
-
-```javascript
-const response = await axios.get('https://data.culture.gouv.fr/api/records/1.0/search/', {
-  params: {
-    dataset: 'musees-de-france',
-    q: 'louvre',
-    refine: 'theme="Art" AND region="Île-de-France"',
-    rows: 20,
-    start: 0,
-    facet: ['theme', 'region', 'ville'],
-  },
-})
-```
-
-##### 2. Recherche par Géolocalisation
-
-```javascript
-GET /api/records/1.0/search/?dataset=musees-de-france&geofilter.distance={lat},{lng},{radius}
-```
-
-**Paramètres :**
-
-- `geofilter.distance` : Latitude, longitude, rayon en mètres
-
-##### 3. Détails d'un Musée
-
-```javascript
-GET /api/records/1.0/search/?dataset=musees-de-france&q=recordid:"{museumId}"&rows=1
-```
-
-#### Structure des Données
-
-```javascript
-{
-  "records": [
-    {
-      "recordid": "M0001",
-      "fields": {
-        "nom_officiel": "Musée du Louvre",
-        "ville": "Paris",
-        "region": "Île-de-France",
-        "departement": "Paris",
-        "theme": "Art",
-        "adresse": "Rue de Rivoli, 75001 Paris",
-        "code_postal": "75001",
-        "telephone": "01 40 20 50 50",
-        "email": "info@louvre.fr",
-        "site_web": "https://www.louvre.fr",
-        "geo_point_2d": [48.8606, 2.3376],
-        "horaires": "9h00-18h00",
-        "tarifs": "15€ plein tarif",
-        "description": "Description du musée...",
-        "last_update": "2024-01-01"
-      }
-    }
-  ],
-  "nhits": 1000,
-  "facet_groups": {
-    "theme": [...],
-    "region": [...],
-    "ville": [...]
-  }
-}
-```
-
-## Architecture de l'Application
-
-### Structure des Dossiers
+## 📁 Structure du projet
 
 ```
 src/
-├── components/          # Composants Vue
-│   ├── SearchPanel.vue     # Panneau de recherche
-│   ├── ResultsPanel.vue    # Affichage des résultats
-│   ├── MuseumDetail.vue    # Fiche détaillée
-│   └── MapView.vue         # Carte interactive
-├── services/            # Services API
-│   └── museumApi.js        # Service API des musées
+├── components/          # Composants Vue réutilisables
+│   ├── SearchSidebar.vue    # Barre latérale de recherche
+│   ├── MuseumList.vue       # Liste des musées
+│   ├── MuseumDetail.vue     # Fiche détaillée d'un musée
+│   └── ErrorMessage.vue     # Composant d'erreur
 ├── stores/              # Stores Pinia
-│   └── museumStore.js      # Store principal
+│   └── museum.js            # Store principal des musées
+├── services/            # Services API
+│   └── museofileApi.js      # Service API Muséofile
 ├── assets/              # Ressources statiques
-└── App.vue             # Composant racine
+│   ├── main.css             # Styles principaux
+│   └── base.css             # Styles de base
+├── App.vue              # Composant racine
+└── main.js              # Point d'entrée
 ```
 
-### Flux de Données
+## 🔌 API Muséofile
 
-1. **Recherche** : L'utilisateur saisit des critères dans `SearchPanel`
-2. **API Call** : `museumApi.js` fait la requête vers l'API
-3. **Store Update** : `museumStore.js` met à jour l'état global
-4. **Affichage** : `ResultsPanel` et `MapView` se mettent à jour
-5. **Sélection** : Clic sur un musée → `MuseumDetail` s'affiche
+### Documentation de l'API
 
-### Gestion d'État (Pinia)
+L'application utilise l'API Muséofile du Ministère de la Culture accessible via [data.culture.gouv.fr](https://data.culture.gouv.fr).
 
-Le store `museumStore` gère :
+### Endpoints utilisés
 
-- Résultats de recherche
-- Musée sélectionné
-- Filtres actifs
-- Favoris (localStorage)
-- États de chargement et d'erreur
-- Facettes pour les filtres
+- **Recherche de musées** : `GET /api/records/1.0/search/`
+- **Dataset** : `musees-de-france`
 
-## Responsive Design
+### Paramètres de recherche
+
+```javascript
+{
+  text: string,           // Recherche textuelle
+  region: string,         // Région
+  city: string,          // Ville
+  theme: string,         // Thématique
+  coordinates: {         // Coordonnées géographiques
+    lat: number,
+    lng: number
+  },
+  freeEntry: boolean,    // Entrée gratuite
+  wheelchairAccessible: boolean, // Accessible PMR
+  page: number,          // Page (pagination)
+  rows: number          // Nombre de résultats par page
+}
+```
+
+### Exemple de requête
+
+```javascript
+const response = await museofileApi.searchMuseums({
+  text: 'Louvre',
+  region: 'Île-de-France',
+  theme: 'Art',
+  freeEntry: false,
+  page: 0,
+  rows: 20,
+})
+```
+
+## 🎨 Design et Responsive
 
 ### Breakpoints
 
-- **Desktop** : ≥ 1024px - Layout en grille (recherche + résultats + carte)
-- **Tablette** : 768px - 1023px - Layout en colonne
-- **Mobile** : < 768px - Layout vertical, carte masquée par défaut
+- **Mobile** : < 480px
+- **Tablette** : 480px - 768px
+- **Desktop** : > 768px
 
-### Adaptations
+### Caractéristiques du design
 
-- **Navigation** : Menu hamburger sur mobile
-- **Cartes** : Affichage en grille ou liste selon la taille d'écran
-- **Carte** : Masquée sur mobile, accessible via bouton
-- **Formulaires** : Champs empilés sur petits écrans
+- **Interface plein écran** : Utilise 100vh et 100vw
+- **Dégradés modernes** : Arrière-plan avec dégradé coloré
+- **Glassmorphism** : Effets de transparence et flou
+- **Animations fluides** : Transitions CSS3
+- **Typographie** : Hiérarchie claire et lisible
 
-## Fonctionnalités Avancées
+## 🔧 Configuration
 
-### Système de Favoris
+### Variables d'environnement
 
-- Sauvegarde locale avec `localStorage`
-- Persistance entre les sessions
-- Interface intuitive avec icônes
+Créer un fichier `.env` à la racine :
 
-### Gestion d'Erreurs
+```env
+VITE_API_BASE_URL=https://data.culture.gouv.fr/api/records/1.0/search/
+VITE_DATASET=musees-de-france
+```
 
-- Messages d'erreur utilisateur-friendly
-- Retry automatique
-- Fallback en cas d'échec API
+### Personnalisation
 
-### Performance
+- **Couleurs** : Modifier les variables CSS dans `src/assets/main.css`
+- **API** : Configurer l'URL de base dans `src/services/museofileApi.js`
+- **Pagination** : Ajuster `itemsPerPage` dans le store
 
-- Lazy loading des composants
-- Debouncing des recherches
-- Pagination des résultats
-- Optimisation des requêtes API
+## 🚀 Déploiement
 
-## Déploiement
-
-### Build de Production
+### Build de production
 
 ```bash
 npm run build
 ```
 
-Les fichiers de production sont générés dans le dossier `dist/`.
+### Déploiement sur Vercel
 
-### Variables d'Environnement
+```bash
+# Installer Vercel CLI
+npm i -g vercel
 
-Créer un fichier `.env` :
-
-```env
-VITE_API_BASE_URL=https://data.culture.gouv.fr/api/records/1.0/search/
-VITE_MUSEUM_DATASET=musees-de-france
+# Déployer
+vercel
 ```
 
-## Post-Mortem
+### Déploiement sur Netlify
 
-### Défis Rencontrés
+```bash
+# Build
+npm run build
 
-1. **API Rate Limiting** : L'API du Ministère de la Culture a des limites de requêtes
-   - **Solution** : Implémentation de cache et debouncing
+# Déployer le dossier dist/
+```
 
-2. **Données Incomplètes** : Certains musées n'ont pas toutes les informations
-   - **Solution** : Gestion des valeurs par défaut et validation
+## 📊 Post-mortem
 
-3. **Responsive Complexe** : Interface qui doit s'adapter à tous les écrans
-   - **Solution** : CSS Grid et Flexbox avec breakpoints précis
+### Défis rencontrés
 
-4. **Performance Cartes** : Rendu de nombreuses marqueurs sur la carte
-   - **Solution** : Clustering et lazy loading
+1. **API Muséofile** : Documentation limitée, nécessité d'analyser la structure des données
+2. **Responsive design** : Adaptation complexe pour l'interface plein écran
+3. **Gestion d'état** : Coordination entre recherche, pagination et favoris
+4. **Performance** : Optimisation des requêtes API et du rendu des listes
 
-### Améliorations Futures
+### Solutions apportées
+
+1. **Service API robuste** : Gestion d'erreurs et fallback sur données de test
+2. **CSS Grid et Flexbox** : Layout responsive adaptatif
+3. **Pinia** : Gestion d'état centralisée et réactive
+4. **Lazy loading** : Chargement optimisé des composants
+
+### Améliorations futures
 
 - [ ] Authentification utilisateur
 - [ ] API backend pour les favoris
-- [ ] Notifications push
-- [ ] Mode hors-ligne
-- [ ] Export des favoris
-- [ ] Partage social
-- [ ] Recherche vocale
-- [ ] Mode sombre
+- [ ] Cache des données
+- [ ] Mode hors ligne
+- [ ] Tests unitaires
+- [ ] PWA (Progressive Web App)
 
-### Apprentissages
+## 📝 Licence
 
-- **Vue 3 Composition API** : Syntaxe plus claire et réutilisable
-- **Pinia** : Gestion d'état plus simple que Vuex
-- **Leaflet** : Intégration facile pour les cartes
-- **API Open Data** : Richesse des données publiques françaises
+Ce projet est développé dans le cadre d'un workshop sur l'utilisation des APIs Open Data du Ministère de la Culture.
 
-## Contribution
+## 👥 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
 
 1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Commit les changements (`git commit -m 'Ajout nouvelle fonctionnalité'`)
-4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
+2. Créer une branche feature
+3. Commiter vos changements
+4. Pousser vers la branche
 5. Ouvrir une Pull Request
 
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
-
-## Contact
+## 📞 Contact
 
 Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub.
