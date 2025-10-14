@@ -4,6 +4,7 @@ import { useMuseumStore } from './stores/museum'
 import SearchSidebar from './components/SearchSidebar.vue'
 import MuseumList from './components/MuseumList.vue'
 import MuseumDetail from './components/MuseumDetail.vue'
+import FavoritesPage from './components/FavoritesPage.vue'
 import ErrorMessage from './components/ErrorMessage.vue'
 
 const museumStore = useMuseumStore()
@@ -13,10 +14,14 @@ const searchResults = computed(() => museumStore.museums)
 const isLoading = computed(() => museumStore.isLoading)
 const totalCount = computed(() => museumStore.totalCount)
 const error = computed(() => museumStore.error)
+const favoritesCount = computed(() => museumStore.favorites.length)
+
+// navigation state
+const currentPage = ref('search') // 'search' ou 'favorites'
 
 const handleSearch = async (params) => {
   await museumStore.searchMuseums(params)
-  // Fermer les menus après recherche
+  // close menus after search
   isMobileMenuOpen.value = false
   isFiltersOpen.value = false
 }
@@ -37,6 +42,26 @@ const handleRetry = () => {
   museumStore.searchMuseums(museumStore.searchParams)
 }
 
+// Navigation
+const goToFavorites = () => {
+  currentPage.value = 'favorites'
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
+const goToSearch = () => {
+  currentPage.value = 'search'
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
+const goToAccount = () => {
+  // TODO: implement account page
+  alert('Gestion des comptes - Fonctionnalité à venir !')
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
 const isMobileMenuOpen = ref(false)
 const isFiltersOpen = ref(false)
 const isScrolled = ref(false)
@@ -51,17 +76,17 @@ const toggleFilters = () => {
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 50
-  // Fermer les filtres quand on scroll
+  // close filters when scrolling
   if (isFiltersOpen.value) {
     isFiltersOpen.value = false
   }
 }
 
 onMounted(() => {
-  // Charger quelques musées par défaut au démarrage
+  // load some museums on startup
   museumStore.searchMuseums()
 
-  // Écouter le scroll pour l'effet de header compact
+  // listen for scroll to make header compact
   window.addEventListener('scroll', handleScroll)
 })
 
@@ -77,7 +102,7 @@ onUnmounted(() => {
       <div class="header-container">
         <!-- Brand Section -->
         <div class="header-brand">
-          <div class="brand-logo">
+          <div class="brand-logo" @click="goToSearch">
             <div class="logo-icon">🏛️</div>
             <div class="logo-text">
               <h1 class="brand-title">MuséeExplorer</h1>
@@ -88,17 +113,22 @@ onUnmounted(() => {
 
         <!-- Navigation Section -->
         <nav class="header-nav desktop-only">
-          <div class="nav-item">
+          <div class="nav-item" :class="{ active: currentPage === 'search' }" @click="goToSearch">
             <span class="nav-icon">🏠</span>
             <span class="nav-text">Accueil</span>
           </div>
-          <div class="nav-item">
-            <span class="nav-icon">⭐</span>
+          <div
+            class="nav-item"
+            :class="{ active: currentPage === 'favorites' }"
+            @click="goToFavorites"
+          >
+            <span class="nav-icon">❤️</span>
             <span class="nav-text">Favoris</span>
+            <span v-if="favoritesCount > 0" class="nav-badge">{{ favoritesCount }}</span>
           </div>
-          <div class="nav-item">
-            <span class="nav-icon">📍</span>
-            <span class="nav-text">Proche</span>
+          <div class="nav-item" @click="goToAccount">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">Compte</span>
           </div>
         </nav>
 
@@ -115,12 +145,6 @@ onUnmounted(() => {
               <span class="btn-text">Rechercher</span>
               <span class="btn-arrow" :class="{ open: isFiltersOpen }">▼</span>
             </div>
-          </button>
-
-          <!-- Favorites Button -->
-          <button class="action-btn favorites-btn desktop-only">
-            <div class="btn-icon">❤️</div>
-            <span class="btn-badge">3</span>
           </button>
 
           <!-- Mobile Menu Button -->
@@ -151,6 +175,31 @@ onUnmounted(() => {
       <!-- Mobile Menu -->
       <div class="mobile-menu" :class="{ open: isMobileMenuOpen }">
         <div class="mobile-menu-content">
+          <!-- Mobile Navigation -->
+          <div class="mobile-nav">
+            <div
+              class="mobile-nav-item"
+              :class="{ active: currentPage === 'search' }"
+              @click="goToSearch"
+            >
+              <span class="nav-icon">🏠</span>
+              <span class="nav-text">Accueil</span>
+            </div>
+            <div
+              class="mobile-nav-item"
+              :class="{ active: currentPage === 'favorites' }"
+              @click="goToFavorites"
+            >
+              <span class="nav-icon">❤️</span>
+              <span class="nav-text">Favoris</span>
+              <span v-if="favoritesCount > 0" class="nav-badge">{{ favoritesCount }}</span>
+            </div>
+            <div class="mobile-nav-item" @click="goToAccount">
+              <span class="nav-icon">👤</span>
+              <span class="nav-text">Compte</span>
+            </div>
+          </div>
+
           <SearchSidebar @search="handleSearch" :is-loading="isLoading" />
         </div>
       </div>
@@ -160,6 +209,11 @@ onUnmounted(() => {
     <div class="main-content" :class="{ 'search-open': isFiltersOpen }">
       <div class="results-section">
         <MuseumDetail v-if="selectedMuseum" :museum="selectedMuseum" @back="backToList" />
+        <FavoritesPage
+          v-else-if="currentPage === 'favorites'"
+          @select-museum="selectMuseum"
+          @go-to-search="goToSearch"
+        />
         <MuseumList
           v-else
           :museums="searchResults"
@@ -194,9 +248,9 @@ onUnmounted(() => {
 }
 
 .header-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 1.5rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -209,7 +263,8 @@ onUnmounted(() => {
 
 /* Brand Section */
 .header-brand {
-  flex-shrink: 0;
+  grid-column: 1;
+  justify-self: start;
 }
 
 .brand-logo {
@@ -267,13 +322,16 @@ onUnmounted(() => {
 /* Navigation Section */
 .header-nav {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 2rem;
-  margin: 0 2rem;
+  justify-content: center;
+  gap: 1.5rem;
+  grid-column: 2;
+  flex-wrap: nowrap;
 }
 
 .nav-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
@@ -283,12 +341,33 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+  vertical-align: middle;
+  margin: 0 0.5rem;
 }
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-badge {
+  background: #e74c3c;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  animation: pulse 2s infinite;
 }
 
 .nav-icon {
@@ -308,6 +387,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
+  grid-column: 3;
+  justify-self: end;
 }
 
 .action-btn {
@@ -367,6 +448,11 @@ onUnmounted(() => {
 .favorites-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+}
+
+.favorites-btn.active {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .btn-badge {
@@ -522,6 +608,61 @@ onUnmounted(() => {
   padding: 6rem 2rem 2rem 2rem;
 }
 
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+
+.mobile-nav-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.mobile-nav-item.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.mobile-nav-item .nav-icon {
+  font-size: 1.2rem;
+}
+
+.mobile-nav-item .nav-text {
+  font-size: 1rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.mobile-nav-item .nav-badge {
+  background: #e74c3c;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
 .mobile-overlay {
   position: fixed;
   top: 0;
@@ -544,17 +685,30 @@ onUnmounted(() => {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+  .header-container {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
   .header-nav {
-    gap: 1rem;
-    margin: 0 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 1.2rem;
+    grid-column: 2;
+    flex-wrap: nowrap;
   }
 
   .nav-item {
+    display: inline-flex;
+    flex-direction: row;
     padding: 0.5rem 1rem;
   }
 
   .nav-text {
     display: none;
+  }
+
+  .header-brand {
+    min-width: 150px;
   }
 }
 

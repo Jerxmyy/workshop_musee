@@ -46,11 +46,11 @@
                 <option value="Corse">Corse</option>
                 <option value="Grand Est">Grand Est</option>
                 <option value="Hauts-de-France">Hauts-de-France</option>
-                <option value="Île-de-France">Île-de-France</option>
+                <option value="Ile-de-France">Île-de-France</option>
                 <option value="Normandie">Normandie</option>
                 <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
                 <option value="Occitanie">Occitanie</option>
-                <option value="Pays de la Loire">Pays de la Loire</option>
+                <option value="Pays-de-la-Loire">Pays de la Loire</option>
                 <option value="Provence-Alpes-Côte d'Azur">Provence-Alpes-Côte d'Azur</option>
               </select>
               <div class="select-arrow">▼</div>
@@ -208,6 +208,7 @@ const props = defineProps({
 })
 
 const isLoadingLocation = ref(false)
+// const tempLocation = null // unused for now
 
 const searchForm = reactive({
   text: '',
@@ -256,6 +257,7 @@ const getCurrentLocation = () => {
   }
 
   isLoadingLocation.value = true
+  // console.log('getting location...') // debug
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -273,7 +275,7 @@ const getCurrentLocation = () => {
 </script>
 
 <style scoped>
-/* Container principal */
+/* main container */
 .search-sidebar {
   width: 100%;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
@@ -306,7 +308,7 @@ const getCurrentLocation = () => {
   }
 }
 
-/* Header de recherche */
+/* search header */
 .search-header {
   text-align: center;
   padding: 1rem 1.5rem 0.75rem 1.5rem;
@@ -349,7 +351,7 @@ const getCurrentLocation = () => {
   font-weight: 400;
 }
 
-/* Formulaire principal */
+/* main form */
 .search-form {
   padding: 1rem 1.5rem;
   display: flex;

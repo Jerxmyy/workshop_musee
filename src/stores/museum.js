@@ -20,6 +20,8 @@ export const useMuseumStore = defineStore('museum', {
     currentPage: 1,
     itemsPerPage: 12,
     favorites: JSON.parse(localStorage.getItem('museumFavorites') || '[]'),
+    // temp variable for debugging
+    debugMode: false,
   }),
 
   getters: {
@@ -45,24 +47,28 @@ export const useMuseumStore = defineStore('museum', {
       try {
         let response
 
-        // Si des coordonnées sont fournies, utiliser la recherche par localisation
+        // check if we have coordinates for location search
         if (params.coordinates && params.coordinates.lat && params.coordinates.lng) {
           response = await museofileApi.getMuseumsByLocation(
             params.coordinates.lat,
             params.coordinates.lng,
-            50, // Rayon de 50km par défaut
+            50, // 50km radius
           )
         } else {
-          // Sinon, utiliser la recherche classique
+          // normal search
           response = await museofileApi.searchMuseums({
             ...params,
-            page: this.currentPage - 1, // L'API utilise une pagination basée sur 0
+            page: this.currentPage - 1, // API uses 0-based pagination
             rows: this.itemsPerPage,
           })
         }
 
         this.museums = response.museums
         this.totalCount = response.totalCount
+        // console.log('search completed', this.museums.length) // debug
+        if (this.debugMode) {
+          console.log('debug: search results', response)
+        }
       } catch (error) {
         this.error = error.message || 'Erreur lors de la recherche des musées'
         console.error('Erreur de recherche:', error)
@@ -78,7 +84,6 @@ export const useMuseumStore = defineStore('museum', {
       this.error = null
 
       try {
-        // Utilisation de l'API Muséofile réelle
         const museum = await museofileApi.getMuseumById(id)
         this.selectedMuseum = museum
       } catch (error) {
@@ -98,8 +103,12 @@ export const useMuseumStore = defineStore('museum', {
         this.favorites.push(museumId)
       }
 
-      // Sauvegarder dans le localStorage
+      // save to localStorage
       localStorage.setItem('museumFavorites', JSON.stringify(this.favorites))
+      // console.log('favorite toggled', museumId) // debug
+      if (this.debugMode) {
+        console.log('debug: favorite toggled', museumId, this.favorites)
+      }
     },
 
     setSelectedMuseum(museum) {
@@ -112,6 +121,8 @@ export const useMuseumStore = defineStore('museum', {
 
     setPage(page) {
       this.currentPage = page
+      // re-run search with new page
+      this.searchMuseums(this.searchParams)
     },
   },
 })

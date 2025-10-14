@@ -1,5 +1,12 @@
 # 🏛️ MuséeExplorer
 
+<!-- ========================================
+     APPLICATION DE DÉCOUVERTE DE MUSEES
+     ========================================
+     Application Vue.js moderne et responsive pour découvrir
+     les trésors culturels de France
+     ======================================== -->
+
 Une application Vue.js moderne et responsive pour découvrir et explorer les trésors culturels de France. MuséeExplorer vous permet de rechercher, filtrer et explorer les musées avec une interface intuitive et des fonctionnalités avancées.
 
 ## ✨ Fonctionnalités

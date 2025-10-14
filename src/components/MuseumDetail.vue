@@ -1,6 +1,6 @@
 <template>
   <div class="museum-detail">
-    <!-- Bouton retour -->
+    <!-- Back button -->
     <div class="detail-header">
       <button @click="goBack" class="back-btn">
         <span class="back-icon">←</span>
@@ -8,9 +8,9 @@
       </button>
     </div>
 
-    <!-- Contenu principal -->
+    <!-- Main container -->
     <div class="detail-content">
-      <!-- Informations du musée -->
+      <!-- Museum information -->
       <div class="museum-info">
         <div class="museum-hero">
           <div class="museum-image-large">
@@ -35,13 +35,13 @@
           </div>
         </div>
 
-        <!-- Description -->
+        <!-- Description section -->
         <div class="museum-description-section">
           <h2 class="section-title">Description</h2>
           <p class="museum-description">{{ museum.description }}</p>
         </div>
 
-        <!-- Informations pratiques -->
+        <!-- Practical section -->
         <div class="practical-info">
           <h2 class="section-title">Informations pratiques</h2>
 
@@ -77,7 +77,7 @@
           </div>
         </div>
 
-        <!-- Thématiques -->
+        <!-- Themes section -->
         <div class="themes-section" v-if="museum.themes && museum.themes.length">
           <h2 class="section-title">Thématiques</h2>
           <div class="themes-list">
@@ -88,10 +88,16 @@
         </div>
       </div>
 
-      <!-- Carte -->
+      <!-- Map -->
       <div class="museum-map">
         <h2 class="section-title">Localisation</h2>
-        <div id="map" class="map-container"></div>
+        <div class="map-container">
+          <div v-if="museum.coordinates" id="map" class="map"></div>
+          <div v-else class="no-coordinates">
+            <span class="no-coordinates-icon">📍</span>
+            <p>Coordonnées non disponibles</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -130,10 +136,18 @@ let map = null
 
 const goBack = () => {
   emit('back')
+  // debug log
+  if (window.debugMuseumApp) {
+    console.log('going back to list')
+  }
 }
 
 const toggleFavorite = () => {
   museumStore.toggleFavorite(props.museum.id)
+  // debug log
+  if (window.debugMuseumApp) {
+    console.log('favorite toggled for museum:', props.museum.name)
+  }
 }
 
 const shareMuseum = async () => {
@@ -148,7 +162,7 @@ const shareMuseum = async () => {
       console.log('Erreur lors du partage:', err)
     }
   } else {
-    // Fallback pour les navigateurs qui ne supportent pas l'API Web Share
+    // Fallback for browsers that don't support the Web Share API
     navigator.clipboard.writeText(window.location.href)
     alert('Lien copié dans le presse-papiers!')
   }
@@ -178,10 +192,18 @@ const initMap = async () => {
     attribution: '© OpenStreetMap contributors',
   }).addTo(map)
 
-  // Ajout du marqueur
+  // Ajout du marqueur avec popup personnalisée
+  const popupContent = `
+    <div class="popup-content">
+      <h3>${props.museum.name}</h3>
+      <p>${props.museum.address}</p>
+      ${props.museum.city ? `<p>${props.museum.city}, ${props.museum.region}</p>` : ''}
+    </div>
+  `
+
   L.marker([props.museum.coordinates.lat, props.museum.coordinates.lng])
     .addTo(map)
-    .bindPopup(`<b>${props.museum.name}</b><br>${props.museum.address}`)
+    .bindPopup(popupContent)
     .openPopup()
 }
 
@@ -197,6 +219,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* main container */
 .museum-detail {
   height: 100%;
   display: flex;
@@ -430,6 +453,45 @@ onUnmounted(() => {
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #e1e8ed;
+  position: relative;
+}
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+
+.no-coordinates {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  color: #7f8c8d;
+}
+
+.no-coordinates-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+.no-coordinates p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.popup-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.popup-content p {
+  margin: 0 0 0.25rem 0;
+  color: #5d6d7e;
+  font-size: 0.9rem;
 }
 
 .detail-actions {

@@ -1,19 +1,19 @@
 <template>
   <div class="museum-list">
-    <!-- État de chargement -->
+    <!-- loading state -->
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p class="loading-text">Recherche des musées...</p>
     </div>
 
-    <!-- État vide -->
+    <!-- empty state -->
     <div v-else-if="museums.length === 0" class="empty-state">
       <div class="empty-icon">🏛️</div>
       <h3 class="empty-title">Aucun musée trouvé</h3>
       <p class="empty-description">Utilisez les filtres de recherche pour découvrir des musées.</p>
     </div>
 
-    <!-- Liste des musées -->
+    <!-- museums list -->
     <div v-else class="museums-grid">
       <div
         v-for="museum in museums"
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <!-- Pagination -->
+    <!-- pagination -->
     <div v-if="totalPages > 1" class="pagination">
       <button
         @click="goToPage(currentPage - 1)"

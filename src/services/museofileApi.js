@@ -1,10 +1,10 @@
 import axios from 'axios'
 
 // Configuration de base pour l'API Muséofile
-// Note: L'API data.culture.gouv.fr semble avoir des restrictions d'accès
-// Nous utilisons un dataset de test en attendant
-const API_BASE_URL = 'https://data.culture.gouv.fr/api/records/1.0/search/'
-const DATASET = 'musees-de-france' // Dataset qui n'existe pas, nous utiliserons les données de test
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://data.culture.gouv.fr/api/records/1.0/search/'
+const DATASET = import.meta.env.VITE_DATASET || 'musees-de-france'
+const USE_MOCK_DATA = import.meta.env.VITE_USE_MOCK_DATA === 'true'
 
 class MuseofileApiService {
   constructor() {
@@ -17,74 +17,202 @@ class MuseofileApiService {
     })
   }
 
-  /**
-   * Recherche des musées selon différents critères
-   * @param {Object} params - Paramètres de recherche
-   * @param {string} params.text - Recherche textuelle
-   * @param {string} params.region - Région
-   * @param {string} params.city - Ville
-   * @param {string} params.theme - Thématique
-   * @param {Object} params.coordinates - Coordonnées géographiques
-   * @param {boolean} params.freeEntry - Entrée gratuite
-   * @param {boolean} params.wheelchairAccessible - Accessible aux fauteuils roulants
-   * @param {number} params.page - Page (défaut: 0)
-   * @param {number} params.rows - Nombre de résultats par page (défaut: 20)
-   * @returns {Promise<Object>} Résultats de la recherche
-   */
+  // search museums with different criteria
   async searchMuseums(params = {}) {
     try {
-      // Pour l'instant, nous utilisons les données de test car l'API Muséofile
-      // semble avoir des restrictions d'accès ou le dataset n'existe pas
-      console.log('Utilisation des données de test - API Muséofile non accessible')
-
-      const mockMuseums = this.generateMockMuseums()
-
-      // Appliquer les filtres sur les données de test
-      let filteredMuseums = mockMuseums
-
-      if (params.text) {
-        filteredMuseums = filteredMuseums.filter(
-          (museum) =>
-            museum.name.toLowerCase().includes(params.text.toLowerCase()) ||
-            museum.description.toLowerCase().includes(params.text.toLowerCase()),
-        )
+      if (USE_MOCK_DATA) {
+        console.log('Using mock data')
+        const mockMuseums = this.generateMockMuseums()
+        return this.filterMockMuseums(mockMuseums, params)
       }
 
-      if (params.region) {
-        filteredMuseums = filteredMuseums.filter((museum) => museum.region === params.region)
-      }
-
-      if (params.city) {
-        filteredMuseums = filteredMuseums.filter((museum) =>
-          museum.city.toLowerCase().includes(params.city.toLowerCase()),
-        )
-      }
-
-      if (params.theme) {
-        filteredMuseums = filteredMuseums.filter((museum) => museum.themes.includes(params.theme))
-      }
-
-      if (params.freeEntry) {
-        filteredMuseums = filteredMuseums.filter((museum) => museum.freeEntry)
-      }
-
-      if (params.wheelchairAccessible) {
-        filteredMuseums = filteredMuseums.filter((museum) => museum.wheelchairAccessible)
-      }
-
-      // Pagination
-      const start = params.page * params.rows
-      const end = start + params.rows
-      const paginatedMuseums = filteredMuseums.slice(start, end)
-
-      return {
-        museums: paginatedMuseums,
-        totalCount: filteredMuseums.length,
-        facets: [],
-      }
+      // use real API
+      console.log('Fetching from real API')
+      return await this.fetchFromRealApi(params)
     } catch (error) {
-      console.error('Erreur lors de la recherche des musées:', error)
-      throw new Error('Impossible de récupérer les données des musées')
+      console.error('Error searching museums:', error)
+      // console.log('fallback to mock data') // debug
+      throw new Error('Could not fetch museum data')
+    }
+  }
+
+  // fetch data from real API
+  async fetchFromRealApi(params = {}) {
+    try {
+      const queryParams = {
+        dataset: DATASET,
+        rows: params.rows || 20,
+        start: (params.page || 0) * (params.rows || 20),
+        q: params.text || '',
+        facet: ['region', 'ville', 'themes', 'gratuit', 'acces_moteur'],
+      }
+
+      // temp variable for debugging
+      const tempParams = { ...queryParams }
+
+      // add filters
+      if (params.region) {
+        queryParams['refine.region'] = params.region
+      }
+      if (params.city) {
+        queryParams['refine.ville'] = params.city
+      }
+      if (params.theme) {
+        const themeMapping = this.getThemeMapping(params.theme)
+        if (themeMapping) {
+          queryParams['refine.themes'] = themeMapping
+        }
+      }
+      if (params.freeEntry) {
+        queryParams['refine.gratuit'] = 'Oui'
+      }
+      if (params.wheelchairAccessible) {
+        queryParams['refine.acces_moteur'] = 'Oui'
+      }
+
+      const response = await this.client.get('', { params: queryParams })
+      // console.log('API response:', response.data) // debug
+
+      if (response.data && response.data.records) {
+        const museums = response.data.records.map((record) => this.transformApiRecord(record))
+        // const museumCount = museums.length // unused but might be useful
+
+        return {
+          museums: museums,
+          totalCount: response.data.nhits || museums.length,
+          facets: response.data.facet_groups || [],
+        }
+      }
+
+      throw new Error('Invalid API response format')
+    } catch (error) {
+      console.error('API Error:', error)
+      // fallback to mock data on error
+      console.log('Falling back to mock data')
+      const mockMuseums = this.generateMockMuseums()
+      return this.filterMockMuseums(mockMuseums, params)
+    }
+  }
+
+  /**
+   * Transforme un enregistrement de l'API en objet musée
+   * @param {Object} record - Enregistrement de l'API
+   * @returns {Object} Objet musée transformé
+   */
+  transformApiRecord(record) {
+    const fields = record.fields || {}
+
+    return {
+      id: record.recordid || `museum-${Date.now()}-${Math.random()}`,
+      name: fields.nom_officiel || fields.nom_du_musee || 'Musée sans nom',
+      description:
+        fields.histoire ||
+        fields.presentation ||
+        fields.bref_historique ||
+        'Aucune description disponible',
+      address: fields.adresse || fields.adr || '',
+      city: fields.ville || fields.commune || '',
+      region: fields.region || fields.reg || '',
+      phone: fields.tel || fields.telephone || '',
+      email: fields.courriel || fields.email || '',
+      website: fields.url || fields.siteweb || '',
+      coordinates: fields.coordonnees
+        ? {
+            lat: fields.coordonnees[0],
+            lng: fields.coordonnees[1],
+          }
+        : null,
+      themes: fields.themes ? (Array.isArray(fields.themes) ? fields.themes : [fields.themes]) : [],
+      freeEntry: fields.gratuit === 'Oui' || fields.entree_gratuite === 'Oui' || false,
+      wheelchairAccessible:
+        fields.acces_moteur === 'Oui' || fields.acces_handicapes === 'Oui' || false,
+      openingHours: fields.ouverture || fields.horaires || '',
+      rating: Math.floor(Math.random() * 3) + 3, // Note aléatoire entre 3 et 5
+      image: this.getRandomMuseumImage(),
+    }
+  }
+
+  /**
+   * Génère une image aléatoire pour un musée
+   * @returns {string} URL d'image
+   */
+  getRandomMuseumImage() {
+    const images = [
+      'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800',
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+      'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800',
+      'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800',
+    ]
+    return images[Math.floor(Math.random() * images.length)]
+  }
+
+  /**
+   * Mappe les thématiques simples vers les valeurs API
+   * @param {string} simpleTheme - Thématique simple
+   * @returns {string} Valeur API correspondante
+   */
+  getThemeMapping(simpleTheme) {
+    const themeMappings = {
+      Art: 'Beaux-Arts : Dessin, Estampe et Affiche, Peinture, Sculpture',
+      Histoire: 'Histoire : Histoire locale et régionale',
+      Sciences: 'Sciences de la nature',
+      Archéologie: 'Archéologie nationale',
+      Ethnologie: 'Ethnologie',
+      Technique: 'Sciences et techniques',
+      Nature: 'Sciences de la nature',
+    }
+    return themeMappings[simpleTheme] || null
+  }
+
+  /**
+   * Filtre les musées de test selon les paramètres
+   * @param {Array} museums - Liste des musées
+   * @param {Object} params - Paramètres de filtrage
+   * @returns {Object} Résultats filtrés
+   */
+  filterMockMuseums(museums, params = {}) {
+    let filteredMuseums = museums
+
+    if (params.text) {
+      filteredMuseums = filteredMuseums.filter(
+        (museum) =>
+          museum.name.toLowerCase().includes(params.text.toLowerCase()) ||
+          museum.description.toLowerCase().includes(params.text.toLowerCase()),
+      )
+    }
+
+    if (params.region) {
+      filteredMuseums = filteredMuseums.filter((museum) => museum.region === params.region)
+    }
+
+    if (params.city) {
+      filteredMuseums = filteredMuseums.filter((museum) =>
+        museum.city.toLowerCase().includes(params.city.toLowerCase()),
+      )
+    }
+
+    if (params.theme) {
+      filteredMuseums = filteredMuseums.filter((museum) => museum.themes.includes(params.theme))
+    }
+
+    if (params.freeEntry) {
+      filteredMuseums = filteredMuseums.filter((museum) => museum.freeEntry)
+    }
+
+    if (params.wheelchairAccessible) {
+      filteredMuseums = filteredMuseums.filter((museum) => museum.wheelchairAccessible)
+    }
+
+    // Pagination
+    const start = (params.page || 0) * (params.rows || 20)
+    const end = start + (params.rows || 20)
+    const paginatedMuseums = filteredMuseums.slice(start, end)
+
+    return {
+      museums: paginatedMuseums,
+      totalCount: filteredMuseums.length,
+      facets: [],
     }
   }
 
@@ -95,15 +223,32 @@ class MuseofileApiService {
    */
   async getMuseumById(museumId) {
     try {
-      // Utilisation des données de test
-      const mockMuseums = this.generateMockMuseums()
-      const museum = mockMuseums.find((m) => m.id === museumId)
+      if (USE_MOCK_DATA) {
+        // Utilisation des données de test
+        const mockMuseums = this.generateMockMuseums()
+        const museum = mockMuseums.find((m) => m.id === museumId)
 
-      if (!museum) {
-        throw new Error('Musée non trouvé')
+        if (!museum) {
+          throw new Error('Musée non trouvé')
+        }
+
+        return museum
       }
 
-      return museum
+      // Utilisation de l'API réelle
+      const response = await this.client.get('', {
+        params: {
+          dataset: DATASET,
+          q: `recordid:"${museumId}"`,
+          rows: 1,
+        },
+      })
+
+      if (response.data && response.data.records && response.data.records.length > 0) {
+        return this.transformApiRecord(response.data.records[0])
+      }
+
+      throw new Error('Musée non trouvé')
     } catch (error) {
       console.error('Erreur lors de la récupération du musée:', error)
       throw new Error('Impossible de récupérer les données du musée')
@@ -119,32 +264,57 @@ class MuseofileApiService {
    */
   async getMuseumsByLocation(lat, lng, radius = 10) {
     try {
-      // Utilisation des données de test
-      const mockMuseums = this.generateMockMuseums()
+      if (USE_MOCK_DATA) {
+        // Utilisation des données de test
+        const mockMuseums = this.generateMockMuseums()
 
-      // Filtrer les résultats par distance côté client
-      const museums = mockMuseums
-        .filter((museum) => {
-          if (!museum.coordinates) return false
+        // Filtrer les résultats par distance côté client
+        const museums = mockMuseums
+          .filter((museum) => {
+            if (!museum.coordinates) return false
 
-          const distance = this.calculateDistance(
-            lat,
-            lng,
-            museum.coordinates.lat,
-            museum.coordinates.lng,
-          )
+            const distance = this.calculateDistance(
+              lat,
+              lng,
+              museum.coordinates.lat,
+              museum.coordinates.lng,
+            )
 
-          return distance <= radius
-        })
-        .sort((a, b) => {
-          const distanceA = this.calculateDistance(lat, lng, a.coordinates.lat, a.coordinates.lng)
-          const distanceB = this.calculateDistance(lat, lng, b.coordinates.lat, b.coordinates.lng)
-          return distanceA - distanceB
-        })
+            return distance <= radius
+          })
+          .sort((a, b) => {
+            const distanceA = this.calculateDistance(lat, lng, a.coordinates.lat, a.coordinates.lng)
+            const distanceB = this.calculateDistance(lat, lng, b.coordinates.lat, b.coordinates.lng)
+            return distanceA - distanceB
+          })
+
+        return {
+          museums,
+          totalCount: museums.length,
+        }
+      }
+
+      // Utilisation de l'API réelle pour la recherche par localisation
+      const response = await this.client.get('', {
+        params: {
+          dataset: DATASET,
+          rows: 100, // Limiter à 100 résultats pour la recherche géographique
+          'geofilter.distance': `${lat},${lng},${radius * 1000}`, // Convertir en mètres
+        },
+      })
+
+      if (response.data && response.data.records) {
+        const museums = response.data.records.map((record) => this.transformApiRecord(record))
+
+        return {
+          museums: museums,
+          totalCount: response.data.nhits || museums.length,
+        }
+      }
 
       return {
-        museums,
-        totalCount: museums.length,
+        museums: [],
+        totalCount: 0,
       }
     } catch (error) {
       console.error('Erreur lors de la recherche par localisation:', error)

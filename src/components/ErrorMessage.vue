@@ -1,3 +1,5 @@
+<!-- error message component -->
+
 <template>
   <div v-if="error" class="error-message">
     <div class="error-content">

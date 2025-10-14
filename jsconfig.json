@@ -1,4 +1,14 @@
 {
+  // ========================================
+  // CONFIGURATION JAVASCRIPT - ALIAS ET PATHS
+  // ========================================
+  // Configuration TypeScript/JavaScript pour l'IDE
+  // Fonctionnalités :
+  // - Alias @ pour les imports depuis src/
+  // - Exclusions des dossiers de build
+  // - Support de l'autocomplétion
+  // - Configuration des chemins de modules
+
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
