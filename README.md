@@ -1,12 +1,5 @@
 # 🏛️ MuséeExplorer
 
-<!-- ========================================
-     APPLICATION DE DÉCOUVERTE DE MUSEES
-     ========================================
-     Application Vue.js moderne et responsive pour découvrir
-     les trésors culturels de France
-     ======================================== -->
-
 Une application Vue.js moderne et responsive pour découvrir et explorer les trésors culturels de France. MuséeExplorer vous permet de rechercher, filtrer et explorer les musées avec une interface intuitive et des fonctionnalités avancées.
 
 ## ✨ Fonctionnalités
@@ -66,7 +59,7 @@ Une application Vue.js moderne et responsive pour découvrir et explorer les tr�
 
 ```bash
 # Cloner le repository
-git clone <url-du-repo>
+git clone <https://github.com/Jerxmyy/workshop_musee>
 cd workshop-musee
 
 # Installer les dépendances
@@ -183,8 +176,8 @@ const response = await museofileApi.searchMuseums({
 Créer un fichier `.env` à la racine :
 
 ```env
-VITE_API_BASE_URL=https://data.culture.gouv.fr/api/records/1.0/search/
-VITE_DATASET=musees-de-france
+VITE_API_BASE_URL=https://data.culture.gouv.fr/api/explore/v2.1/catalog/datasets/musees-de-france-base-museofile
+VITE_DATASET=musees-de-france-base-museofile
 ```
 
 ### Personnalisation
