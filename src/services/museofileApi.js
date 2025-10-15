@@ -275,49 +275,83 @@ class MuseofileApiService {
    */
   async getFacets() {
     try {
-      // Récupérer les facettes depuis l'API v2.1
-      const response = await this.client.get('/records', {
-        params: {
-          select: 'region,departement,ville,domaine_thematique',
-          limit: 1000,
-        },
-      })
+      // Récupérer toutes les données par pagination (limite max = 100)
+      const allMuseums = []
+      let offset = 0
+      const limit = 100
+      let hasMore = true
 
-      if (response.data && response.data.results) {
-        const museums = response.data.results
+      while (hasMore) {
+        const response = await this.client.get('/records', {
+          params: {
+            select: 'region,departement,ville,domaine_thematique',
+            limit: limit,
+            offset: offset,
+          },
+        })
 
-        const regions = [...new Set(museums.map((m) => m.region).filter(Boolean))]
-        const departments = [...new Set(museums.map((m) => m.departement).filter(Boolean))]
-        const cities = [...new Set(museums.map((m) => m.ville).filter(Boolean))]
-        const themes = [...new Set(museums.map((m) => m.domaine_thematique).filter(Boolean))]
+        if (response.data && response.data.results) {
+          allMuseums.push(...response.data.results)
+
+          // Vérifier s'il y a plus de données
+          hasMore = response.data.results.length === limit
+          offset += limit
+        } else {
+          hasMore = false
+        }
+      }
+
+      if (allMuseums.length > 0) {
+        // Extraire les régions
+        const regions = [...new Set(allMuseums.map((m) => m.region).filter(Boolean))]
+
+        // Extraire les départements
+        const departments = [...new Set(allMuseums.map((m) => m.departement).filter(Boolean))]
+
+        // Extraire les villes
+        const cities = [...new Set(allMuseums.map((m) => m.ville).filter(Boolean))]
+
+        // Extraire les thématiques (domaine_thematique est un tableau)
+        const allThemes = []
+        allMuseums.forEach((m) => {
+          if (m.domaine_thematique && Array.isArray(m.domaine_thematique)) {
+            allThemes.push(...m.domaine_thematique)
+          }
+        })
+        const themes = [...new Set(allThemes.filter(Boolean))]
 
         return [
           {
             name: 'region',
             facets: regions.map((region) => ({
               name: region,
-              count: museums.filter((m) => m.region === region).length,
+              count: allMuseums.filter((m) => m.region === region).length,
             })),
           },
           {
             name: 'departement',
             facets: departments.map((department) => ({
               name: department,
-              count: museums.filter((m) => m.departement === department).length,
+              count: allMuseums.filter((m) => m.departement === department).length,
             })),
           },
           {
             name: 'ville',
             facets: cities.map((city) => ({
               name: city,
-              count: museums.filter((m) => m.ville === city).length,
+              count: allMuseums.filter((m) => m.ville === city).length,
             })),
           },
           {
             name: 'thematique',
             facets: themes.map((theme) => ({
               name: theme,
-              count: museums.filter((m) => m.domaine_thematique === theme).length,
+              count: allMuseums.filter(
+                (m) =>
+                  m.domaine_thematique &&
+                  Array.isArray(m.domaine_thematique) &&
+                  m.domaine_thematique.includes(theme),
+              ).length,
             })),
           },
         ]
