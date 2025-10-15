@@ -37,26 +37,52 @@
               Région
             </label>
             <div class="select-wrapper">
-              <select id="region" v-model="searchForm.region" class="form-select">
-                <option value="">Toutes les régions</option>
-                <option value="Auvergne-Rhône-Alpes">Auvergne-Rhône-Alpes</option>
-                <option value="Bourgogne-Franche-Comté">Bourgogne-Franche-Comté</option>
-                <option value="Bretagne">Bretagne</option>
-                <option value="Centre-Val de Loire">Centre-Val de Loire</option>
-                <option value="Corse">Corse</option>
-                <option value="Grand Est">Grand Est</option>
-                <option value="Hauts-de-France">Hauts-de-France</option>
-                <option value="Ile-de-France">Île-de-France</option>
-                <option value="Normandie">Normandie</option>
-                <option value="Nouvelle-Aquitaine">Nouvelle-Aquitaine</option>
-                <option value="Occitanie">Occitanie</option>
-                <option value="Pays-de-la-Loire">Pays de la Loire</option>
-                <option value="Provence-Alpes-Côte d'Azur">Provence-Alpes-Côte d'Azur</option>
+              <select
+                id="region"
+                v-model="searchForm.region"
+                class="form-select"
+                :disabled="isLoadingRegions"
+              >
+                <option value="">
+                  {{ isLoadingRegions ? 'Chargement...' : 'Toutes les régions' }}
+                </option>
+                <option v-for="region in availableRegions" :key="region" :value="region">
+                  {{ region }}
+                </option>
               </select>
               <div class="select-arrow">▼</div>
             </div>
           </div>
 
+          <div class="form-group">
+            <label for="department" class="form-label">
+              <span class="label-icon">🏛️</span>
+              Département
+            </label>
+            <div class="select-wrapper">
+              <select
+                id="department"
+                v-model="searchForm.department"
+                class="form-select"
+                :disabled="isLoadingDepartments"
+              >
+                <option value="">
+                  {{ isLoadingDepartments ? 'Chargement...' : 'Tous les départements' }}
+                </option>
+                <option
+                  v-for="department in availableDepartments"
+                  :key="department"
+                  :value="department"
+                >
+                  {{ department }}
+                </option>
+              </select>
+              <div class="select-arrow">▼</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters-row">
           <div class="form-group">
             <label for="city" class="form-label">
               <span class="label-icon">🏙️</span>
@@ -83,15 +109,18 @@
               Thématique
             </label>
             <div class="select-wrapper">
-              <select id="theme" v-model="searchForm.theme" class="form-select">
-                <option value="">Toutes les thématiques</option>
-                <option value="Art">Art</option>
-                <option value="Histoire">Histoire</option>
-                <option value="Sciences">Sciences</option>
-                <option value="Archéologie">Archéologie</option>
-                <option value="Ethnologie">Ethnologie</option>
-                <option value="Technique">Technique</option>
-                <option value="Nature">Nature</option>
+              <select
+                id="theme"
+                v-model="searchForm.theme"
+                class="form-select"
+                :disabled="isLoadingThemes"
+              >
+                <option value="">
+                  {{ isLoadingThemes ? 'Chargement...' : 'Toutes les thématiques' }}
+                </option>
+                <option v-for="theme in availableThemes" :key="theme" :value="theme">
+                  {{ theme }}
+                </option>
               </select>
               <div class="select-arrow">▼</div>
             </div>
@@ -197,7 +226,8 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import museofileApi from '../services/museofileApi'
 
 const emit = defineEmits(['search'])
 const props = defineProps({
@@ -208,11 +238,17 @@ const props = defineProps({
 })
 
 const isLoadingLocation = ref(false)
-// const tempLocation = null // unused for now
+const availableThemes = ref([])
+const availableRegions = ref([])
+const availableDepartments = ref([])
+const isLoadingThemes = ref(false)
+const isLoadingRegions = ref(false)
+const isLoadingDepartments = ref(false)
 
 const searchForm = reactive({
   text: '',
   region: '',
+  department: '',
   city: '',
   theme: '',
   latitude: null,
@@ -225,6 +261,7 @@ const handleSubmit = () => {
   const searchParams = {
     text: searchForm.text.trim(),
     region: searchForm.region,
+    department: searchForm.department,
     city: searchForm.city.trim(),
     theme: searchForm.theme,
     coordinates:
@@ -250,6 +287,185 @@ const clearForm = () => {
   searchForm.longitude = null
 }
 
+const loadThemes = async () => {
+  isLoadingThemes.value = true
+  try {
+    const facets = await museofileApi.getFacets()
+    const themeFacet = facets.find((facet) => facet.name === 'thematique')
+    if (themeFacet) {
+      availableThemes.value = themeFacet.facets.map((f) => f.name).sort()
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des thématiques:', error)
+    // Fallback vers les thématiques par défaut
+    availableThemes.value = [
+      'Art',
+      'Histoire',
+      'Sciences',
+      'Archéologie',
+      'Ethnologie',
+      'Technique',
+      'Nature',
+      'Beaux-arts',
+      'Arts décoratifs',
+    ]
+  } finally {
+    isLoadingThemes.value = false
+  }
+}
+
+const loadRegions = async () => {
+  isLoadingRegions.value = true
+  try {
+    const facets = await museofileApi.getFacets()
+    const regionFacet = facets.find((facet) => facet.name === 'region')
+    if (regionFacet) {
+      availableRegions.value = regionFacet.facets.map((f) => f.name).sort()
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des régions:', error)
+    // Fallback vers les régions par défaut
+    availableRegions.value = [
+      'Auvergne-Rhône-Alpes',
+      'Bourgogne-Franche-Comté',
+      'Bretagne',
+      'Centre-Val de Loire',
+      'Corse',
+      'DROM',
+      'Grand Est',
+      'Hauts-de-France',
+      'Île-de-France',
+      'Normandie',
+      'Nouvelle-Aquitaine',
+      'Occitanie',
+      'Pays de la Loire',
+      "Provence-Alpes-Côte d'Azur",
+    ]
+  } finally {
+    isLoadingRegions.value = false
+  }
+}
+
+const loadDepartments = async () => {
+  isLoadingDepartments.value = true
+  try {
+    const facets = await museofileApi.getFacets()
+    const departmentFacet = facets.find((facet) => facet.name === 'departement')
+    if (departmentFacet) {
+      availableDepartments.value = departmentFacet.facets.map((f) => f.name).sort()
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des départements:', error)
+    // Fallback vers les départements par défaut (triés par ordre alphabétique)
+    availableDepartments.value = [
+      'Ain',
+      'Aisne',
+      'Allier',
+      'Alpes-de-Haute-Provence',
+      'Alpes-Maritimes',
+      'Ardèche',
+      'Ardennes',
+      'Ariège',
+      'Aube',
+      'Aude',
+      'Aveyron',
+      'Bas-Rhin',
+      'Bouches-du-Rhône',
+      'Calvados',
+      'Cantal',
+      'Charente',
+      'Charente-Maritime',
+      'Cher',
+      'Corrèze',
+      'Corse-du-Sud',
+      "Côte-d'Or",
+      "Côtes-d'Armor",
+      'Creuse',
+      'Deux-Sèvres',
+      'Dordogne',
+      'Doubs',
+      'Drôme',
+      'Essonne',
+      'Eure',
+      'Eure-et-Loir',
+      'Finistère',
+      'Gard',
+      'Gers',
+      'Gironde',
+      'Guadeloupe',
+      'Guyane',
+      'Haut-Rhin',
+      'Haute-Corse',
+      'Haute-Garonne',
+      'Haute-Loire',
+      'Haute-Marne',
+      'Haute-Saône',
+      'Haute-Savoie',
+      'Haute-Vienne',
+      'Hautes-Alpes',
+      'Hautes-Pyrénées',
+      'Hauts-de-Seine',
+      'Hérault',
+      'Ille-et-Vilaine',
+      'Indre',
+      'Indre-et-Loire',
+      'Isère',
+      'Jura',
+      'La Réunion',
+      'Landes',
+      'Loir-et-Cher',
+      'Loire',
+      'Loire-Atlantique',
+      'Loiret',
+      'Lot',
+      'Lot-et-Garonne',
+      'Lozère',
+      'Maine-et-Loire',
+      'Manche',
+      'Marne',
+      'Martinique',
+      'Mayenne',
+      'Mayotte',
+      'Meurthe-et-Moselle',
+      'Meuse',
+      'Morbihan',
+      'Moselle',
+      'Nièvre',
+      'Nord',
+      'Oise',
+      'Orne',
+      'Paris',
+      'Pas-de-Calais',
+      'Puy-de-Dôme',
+      'Pyrénées-Atlantiques',
+      'Pyrénées-Orientales',
+      'Réunion',
+      'Rhône',
+      'Saint-Pierre-et-Miquelon',
+      'Saône-et-Loire',
+      'Sarthe',
+      'Savoie',
+      'Seine-et-Marne',
+      'Seine-Maritime',
+      'Seine-Saint-Denis',
+      'Somme',
+      'Tarn',
+      'Tarn-et-Garonne',
+      'Territoire de Belfort',
+      "Val-d'Oise",
+      'Val-de-Marne',
+      'Var',
+      'Vaucluse',
+      'Vendée',
+      'Vosges',
+      'Yonne',
+      'Yvelines',
+    ]
+  } finally {
+    isLoadingDepartments.value = false
+  }
+}
+
 const getCurrentLocation = () => {
   if (!navigator.geolocation) {
     alert("La géolocalisation n'est pas supportée par ce navigateur.")
@@ -272,6 +488,13 @@ const getCurrentLocation = () => {
     },
   )
 }
+
+// Charger les thématiques, régions et départements au montage du composant
+onMounted(() => {
+  loadThemes()
+  loadRegions()
+  loadDepartments()
+})
 </script>
 
 <style scoped>

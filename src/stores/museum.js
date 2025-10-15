@@ -8,6 +8,7 @@ export const useMuseumStore = defineStore('museum', {
     searchParams: {
       text: '',
       region: '',
+      department: '',
       city: '',
       theme: '',
       coordinates: null,
@@ -18,7 +19,7 @@ export const useMuseumStore = defineStore('museum', {
     error: null,
     totalCount: 0,
     currentPage: 1,
-    itemsPerPage: 12,
+    itemsPerPage: 9,
     favorites: JSON.parse(localStorage.getItem('museumFavorites') || '[]'),
     // temp variable for debugging
     debugMode: false,
@@ -35,6 +36,18 @@ export const useMuseumStore = defineStore('museum', {
 
     favoriteMuseums: (state) => {
       return state.museums.filter((museum) => state.favorites.includes(museum.id))
+    },
+
+    totalPages: (state) => {
+      return Math.ceil(state.totalCount / state.itemsPerPage)
+    },
+
+    hasNextPage: (state) => {
+      return state.currentPage < Math.ceil(state.totalCount / state.itemsPerPage)
+    },
+
+    hasPreviousPage: (state) => {
+      return state.currentPage > 1
     },
   },
 
@@ -123,6 +136,26 @@ export const useMuseumStore = defineStore('museum', {
       this.currentPage = page
       // re-run search with new page
       this.searchMuseums(this.searchParams)
+    },
+
+    nextPage() {
+      if (this.hasNextPage) {
+        this.setPage(this.currentPage + 1)
+      }
+    },
+
+    previousPage() {
+      if (this.hasPreviousPage) {
+        this.setPage(this.currentPage - 1)
+      }
+    },
+
+    goToFirstPage() {
+      this.setPage(1)
+    },
+
+    goToLastPage() {
+      this.setPage(this.totalPages)
     },
   },
 })

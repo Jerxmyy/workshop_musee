@@ -73,6 +73,15 @@
     <!-- pagination -->
     <div v-if="totalPages > 1" class="pagination">
       <button
+        @click="goToPage(1)"
+        :disabled="currentPage === 1"
+        class="pagination-btn"
+        title="Première page"
+      >
+        ⏮️
+      </button>
+
+      <button
         @click="goToPage(currentPage - 1)"
         :disabled="currentPage === 1"
         class="pagination-btn"
@@ -80,7 +89,16 @@
         ← Précédent
       </button>
 
-      <div class="pagination-info">Page {{ currentPage }} sur {{ totalPages }}</div>
+      <div class="pagination-numbers">
+        <button
+          v-for="page in visiblePages"
+          :key="page"
+          @click="goToPage(page)"
+          :class="['pagination-number', { active: page === currentPage }]"
+        >
+          {{ page }}
+        </button>
+      </div>
 
       <button
         @click="goToPage(currentPage + 1)"
@@ -89,6 +107,20 @@
       >
         Suivant →
       </button>
+
+      <button
+        @click="goToPage(totalPages)"
+        :disabled="currentPage === totalPages"
+        class="pagination-btn"
+        title="Dernière page"
+      >
+        ⏭️
+      </button>
+
+      <div class="pagination-info">
+        Page {{ currentPage }} sur {{ totalPages }}
+        <span class="pagination-count">({{ totalCount }} musées au total)</span>
+      </div>
     </div>
   </div>
 </template>
@@ -111,7 +143,7 @@ const props = defineProps({
   },
   itemsPerPage: {
     type: Number,
-    default: 12,
+    default: 9,
   },
 })
 
@@ -121,6 +153,19 @@ const currentPage = ref(1)
 
 const totalPages = computed(() => {
   return Math.ceil(props.totalCount / props.itemsPerPage)
+})
+
+const visiblePages = computed(() => {
+  const pages = []
+  const maxVisible = 5
+  const start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+  const end = Math.min(totalPages.value, start + maxVisible - 1)
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+
+  return pages
 })
 
 const selectMuseum = (museum) => {
@@ -367,9 +412,10 @@ const truncateText = (text, maxLength) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1rem;
   margin-top: 3rem;
   padding: 2rem 0;
+  flex-wrap: wrap;
 }
 
 .pagination-btn {
@@ -381,6 +427,11 @@ const truncateText = (text, maxLength) => {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -394,9 +445,53 @@ const truncateText = (text, maxLength) => {
   transform: none;
 }
 
+.pagination-numbers {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pagination-number {
+  padding: 0.5rem 0.75rem;
+  background: #ecf0f1;
+  color: #2c3e50;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-number:hover {
+  background: #d5dbdb;
+  transform: translateY(-1px);
+}
+
+.pagination-number.active {
+  background: #3498db;
+  color: white;
+}
+
+.pagination-number.active:hover {
+  background: #2980b9;
+}
+
 .pagination-info {
   color: #7f8c8d;
   font-weight: 500;
+  text-align: center;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.pagination-count {
+  font-size: 0.9rem;
+  color: #95a5a6;
 }
 
 @media (max-width: 768px) {
@@ -408,6 +503,17 @@ const truncateText = (text, maxLength) => {
   .pagination {
     flex-direction: column;
     gap: 1rem;
+  }
+
+  .pagination-numbers {
+    order: -1;
+    margin-bottom: 1rem;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
   }
 
   .pagination-info {
