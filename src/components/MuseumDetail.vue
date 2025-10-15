@@ -224,16 +224,17 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: white;
+  background: #1a1a1a;
+  border: 1px solid #404040;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .detail-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #ecf0f1;
-  background: #f8f9fa;
+  border-bottom: 1px solid #555555;
+  background: #2d2d2d;
 }
 
 .back-btn {
@@ -241,7 +242,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: #3498db;
+  background: #007acc;
   color: white;
   border: none;
   border-radius: 8px;
@@ -251,7 +252,7 @@ onUnmounted(() => {
 }
 
 .back-btn:hover {
-  background: #2980b9;
+  background: #0056b3;
   transform: translateX(-2px);
 }
 
@@ -263,18 +264,21 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   overflow: hidden;
+  background: #1a1a1a;
 }
 
 .museum-info {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  background: #1a1a1a;
 }
 
 .museum-map {
   width: 400px;
   padding: 2rem;
-  border-left: 1px solid #ecf0f1;
+  background: #2d2d2d;
+  border-left: 1px solid #555555;
   display: flex;
   flex-direction: column;
 }
@@ -299,7 +303,7 @@ onUnmounted(() => {
 .placeholder-hero {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #404040 0%, #555555 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -318,14 +322,14 @@ onUnmounted(() => {
 .museum-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0 0 1rem 0;
   line-height: 1.2;
 }
 
 .museum-subtitle {
   font-size: 1.2rem;
-  color: #7f8c8d;
+  color: #c0c0c0;
   margin: 0 0 1.5rem 0;
   display: flex;
   align-items: center;
@@ -348,27 +352,27 @@ onUnmounted(() => {
 }
 
 .badge.free {
-  background: #d5f4e6;
-  color: #27ae60;
+  background: #2d4a2d;
+  color: #4ade80;
 }
 
 .badge.accessible {
-  background: #e8f4fd;
-  color: #2980b9;
+  background: #1e3a5f;
+  color: #60a5fa;
 }
 
 .badge.rating {
-  background: #fef5e7;
-  color: #f39c12;
+  background: #4a3c1a;
+  color: #fbbf24;
 }
 
 .section-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #ecf0f1;
+  border-bottom: 2px solid #555555;
 }
 
 .museum-description-section {
@@ -378,7 +382,7 @@ onUnmounted(() => {
 .museum-description {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: #5d6d7e;
+  color: #d0d0d0;
   margin: 0;
 }
 
@@ -394,14 +398,14 @@ onUnmounted(() => {
 
 .info-item {
   padding: 1rem;
-  background: #f8f9fa;
+  background: #404040;
   border-radius: 8px;
 }
 
 .info-label {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #7f8c8d;
+  color: #c0c0c0;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -409,12 +413,12 @@ onUnmounted(() => {
 
 .info-value {
   font-size: 1rem;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0;
 }
 
 .info-link {
-  color: #3498db;
+  color: #007acc;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -440,8 +444,8 @@ onUnmounted(() => {
 }
 
 .theme-tag-large {
-  background: #e8f4fd;
-  color: #2980b9;
+  background: #404040;
+  color: #007acc;
   padding: 0.5rem 1rem;
   border-radius: 25px;
   font-size: 0.95rem;
@@ -484,20 +488,20 @@ onUnmounted(() => {
 
 .popup-content h3 {
   margin: 0 0 0.5rem 0;
-  color: #2c3e50;
+  color: #ffffff;
   font-size: 1.1rem;
 }
 
 .popup-content p {
   margin: 0 0 0.25rem 0;
-  color: #5d6d7e;
+  color: #d0d0d0;
   font-size: 0.9rem;
 }
 
 .detail-actions {
   padding: 1.5rem;
-  border-top: 1px solid #ecf0f1;
-  background: #f8f9fa;
+  border-top: 1px solid #555555;
+  background: #2d2d2d;
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -517,22 +521,22 @@ onUnmounted(() => {
 }
 
 .favorite-btn {
-  background: #e74c3c;
+  background: #dc2626;
   color: white;
 }
 
 .favorite-btn:hover {
-  background: #c0392b;
+  background: #b91c1c;
   transform: translateY(-1px);
 }
 
 .share-btn {
-  background: #3498db;
+  background: #007acc;
   color: white;
 }
 
 .share-btn:hover {
-  background: #2980b9;
+  background: #0056b3;
   transform: translateY(-1px);
 }
 

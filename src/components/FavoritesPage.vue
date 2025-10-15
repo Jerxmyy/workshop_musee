@@ -7,7 +7,7 @@
       <div class="header-content">
         <div class="header-title">
           <h1 class="page-title">
-            <span class="title-icon">⭐</span>
+            <span class="title-icon">❤️</span>
             Mes Favoris
           </h1>
           <p class="page-subtitle">
@@ -166,11 +166,11 @@ const truncateText = (text, maxLength) => {
 <style scoped>
 .favorites-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 }
 
 .favorites-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2d2d2d 0%, #404040 100%);
   color: white;
   padding: 3rem 2rem;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -270,8 +270,8 @@ const truncateText = (text, maxLength) => {
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
+  border: 4px solid #404040;
+  border-top: 4px solid #007acc;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -287,7 +287,7 @@ const truncateText = (text, maxLength) => {
 
 .loading-text {
   font-size: 1.1rem;
-  color: #7f8c8d;
+  color: #a0a0a0;
 }
 
 .empty-state {
@@ -324,13 +324,13 @@ const truncateText = (text, maxLength) => {
 
 .empty-title {
   font-size: 2rem;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0;
   font-weight: 700;
 }
 
 .empty-description {
-  color: #7f8c8d;
+  color: #c0c0c0;
   font-size: 1.1rem;
   max-width: 500px;
   line-height: 1.6;
@@ -341,7 +341,7 @@ const truncateText = (text, maxLength) => {
   align-items: center;
   gap: 0.5rem;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #007acc 0%, #00a8ff 100%);
   color: white;
   border: none;
   border-radius: 25px;
@@ -349,12 +349,12 @@ const truncateText = (text, maxLength) => {
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
 }
 
 .explore-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 122, 204, 0.4);
 }
 
 .favorites-grid {
@@ -364,9 +364,10 @@ const truncateText = (text, maxLength) => {
 }
 
 .favorite-card {
-  background: white;
+  background: #2d2d2d;
+  border: 1px solid #404040;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -377,7 +378,8 @@ const truncateText = (text, maxLength) => {
 
 .favorite-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  border-color: #555555;
 }
 
 .card-image-container {
@@ -400,7 +402,7 @@ const truncateText = (text, maxLength) => {
 .placeholder-image {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #404040 0%, #555555 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -418,7 +420,7 @@ const truncateText = (text, maxLength) => {
   right: 1rem;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(220, 38, 38, 0.9);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -427,13 +429,13 @@ const truncateText = (text, maxLength) => {
   justify-content: center;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
 }
 
 .remove-favorite-btn:hover {
-  background: white;
+  background: #dc2626;
   transform: scale(1.1);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .remove-favorite-btn.removing {
@@ -464,13 +466,13 @@ const truncateText = (text, maxLength) => {
 .museum-name {
   font-size: 1.4rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0;
   line-height: 1.3;
 }
 
 .museum-location {
-  color: #7f8c8d;
+  color: #c0c0c0;
   font-size: 0.95rem;
   margin: 0;
   display: flex;
@@ -489,8 +491,8 @@ const truncateText = (text, maxLength) => {
 }
 
 .theme-tag {
-  background: linear-gradient(135deg, #e8f4fd 0%, #d1ecf1 100%);
-  color: #2980b9;
+  background: linear-gradient(135deg, #404040 0%, #555555 100%);
+  color: #007acc;
   padding: 0.3rem 0.8rem;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -499,7 +501,7 @@ const truncateText = (text, maxLength) => {
 }
 
 .museum-description {
-  color: #5d6d7e;
+  color: #d0d0d0;
   font-size: 0.9rem;
   line-height: 1.6;
   margin: 0;
@@ -511,6 +513,7 @@ const truncateText = (text, maxLength) => {
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: auto;
+  color: #c0c0c0;
 }
 
 .meta-item {
@@ -528,14 +531,14 @@ const truncateText = (text, maxLength) => {
 
 .card-actions {
   padding: 1rem 1.5rem;
-  border-top: 1px solid #ecf0f1;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-top: 1px solid #555555;
+  background: linear-gradient(135deg, #2d2d2d 0%, #404040 100%);
 }
 
 .view-btn {
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #007acc 0%, #00a8ff 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -551,7 +554,7 @@ const truncateText = (text, maxLength) => {
 
 .view-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 122, 204, 0.4);
 }
 
 .view-btn .btn-icon {

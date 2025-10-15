@@ -103,11 +103,18 @@ onUnmounted(() => {
         <!-- Brand Section -->
         <div class="header-brand">
           <div class="brand-logo" @click="goToSearch">
-            <div class="logo-icon">🏛️</div>
-            <div class="logo-text">
-              <h1 class="brand-title">MuséeExplorer</h1>
-              <p class="brand-subtitle">Trésors culturels de France</p>
-            </div>
+            <img
+              src="/logo.png?v=4"
+              alt="MuséeExplorer"
+              class="logo-image"
+              style="
+                width: 150px;
+                height: 150px;
+                display: block;
+                object-fit: contain;
+                flex-shrink: 0;
+              "
+            />
           </div>
         </div>
 
@@ -233,8 +240,9 @@ onUnmounted(() => {
 <style scoped>
 /* Header Container */
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: #2d2d2d;
+  border-bottom: 1px solid #404040;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -242,23 +250,23 @@ onUnmounted(() => {
 }
 
 .header.scrolled {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  background: rgba(45, 45, 45, 0.95);
   backdrop-filter: blur(20px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .header-container {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 1.5rem 2rem;
+  padding: 0.75rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
   transition: padding 0.3s ease;
 }
 
 .header.scrolled .header-container {
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
 }
 
 /* Brand Section */
@@ -269,54 +277,29 @@ onUnmounted(() => {
 
 .brand-logo {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   cursor: pointer;
   transition: transform 0.3s ease;
+  flex-shrink: 0;
 }
 
 .brand-logo:hover {
   transform: scale(1.02);
 }
 
-.logo-icon {
-  font-size: 2.5rem;
+.logo-image {
+  width: 120px !important;
+  height: 120px !important;
+  min-width: 120px;
+  min-height: 120px;
+  max-width: 120px;
+  max-height: 120px;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.brand-title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: white;
-  margin: 0;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  letter-spacing: -0.5px;
-}
-
-.brand-subtitle {
-  font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
 /* Navigation Section */
@@ -335,26 +318,27 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  border-radius: 25px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #404040;
+  border: 1px solid #555555;
   white-space: nowrap;
   vertical-align: middle;
   margin: 0 0.5rem;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: #4a4a4a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: #007acc;
+  color: white;
+  border-color: #007acc;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.4);
 }
 
 .nav-badge {
@@ -377,9 +361,13 @@ onUnmounted(() => {
 
 .nav-text {
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 500;
+  color: #e5e5e5;
+  transition: color 0.3s ease;
+}
+
+.nav-item.active .nav-text {
   color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Actions Section */
@@ -421,38 +409,42 @@ onUnmounted(() => {
 }
 
 .search-btn {
-  background: rgba(255, 255, 255, 0.95);
-  color: #2c3e50;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: #404040;
+  color: #e5e5e5;
+  border: 1px solid #555555;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .search-btn:hover {
-  background: white;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  background: #4a4a4a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .search-btn.active {
-  background: #3498db;
+  background: #007acc;
   color: white;
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+  border-color: #007acc;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.4);
 }
 
 .favorites-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #404040;
+  color: #e5e5e5;
+  border: 1px solid #555555;
   position: relative;
 }
 
 .favorites-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  background: #4a4a4a;
+  transform: translateY(-1px);
 }
 
 .favorites-btn.active {
-  background: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: #007acc;
+  color: white;
+  border-color: #007acc;
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.4);
 }
 
 .btn-badge {
@@ -509,9 +501,9 @@ onUnmounted(() => {
 
 /* Mobile Menu Button */
 .mobile-menu-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #404040;
+  color: #e5e5e5;
+  border: 1px solid #555555;
   padding: 0.75rem;
   width: 50px;
   height: 50px;
@@ -519,7 +511,7 @@ onUnmounted(() => {
 }
 
 .mobile-menu-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #4a4a4a;
 }
 
 .hamburger {
@@ -533,7 +525,7 @@ onUnmounted(() => {
 .hamburger span {
   width: 100%;
   height: 2px;
-  background: white;
+  background: #e5e5e5;
   border-radius: 2px;
   transition: all 0.3s ease;
   transform-origin: center;
@@ -553,10 +545,10 @@ onUnmounted(() => {
 
 /* Search Panel */
 .search-panel {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(45, 45, 45, 0.98);
   backdrop-filter: blur(20px);
   border-radius: 0 0 20px 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -592,12 +584,12 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(45, 45, 45, 0.98);
   backdrop-filter: blur(20px);
   z-index: 1000;
   transform: translateY(-100%);
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-menu.open {
@@ -614,7 +606,7 @@ onUnmounted(() => {
   gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #ecf0f1;
+  border-bottom: 1px solid #555555;
 }
 
 .mobile-nav-item {
@@ -625,20 +617,20 @@ onUnmounted(() => {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: #404040;
+  border: 1px solid #555555;
   position: relative;
 }
 
 .mobile-nav-item:hover {
-  background: #e9ecef;
+  background: #4a4a4a;
   transform: translateX(5px);
 }
 
 .mobile-nav-item.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #007acc;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 122, 204, 0.4);
 }
 
 .mobile-nav-item .nav-icon {
@@ -649,6 +641,11 @@ onUnmounted(() => {
   font-size: 1rem;
   font-weight: 600;
   flex: 1;
+  color: #e5e5e5;
+}
+
+.mobile-nav-item.active .nav-text {
+  color: white;
 }
 
 .mobile-nav-item .nav-badge {
@@ -722,37 +719,39 @@ onUnmounted(() => {
   }
 
   .header-container {
-    padding: 1rem 1.5rem;
-  }
-
-  .brand-title {
-    font-size: 1.5rem;
+    padding: 0.5rem 1.5rem;
   }
 
   .brand-subtitle {
     font-size: 0.75rem;
   }
 
-  .logo-icon {
-    font-size: 2rem;
+  .logo-image {
+    width: 90px !important;
+    height: 90px !important;
+    min-width: 90px;
+    min-height: 90px;
+    max-width: 90px;
+    max-height: 90px;
   }
 }
 
 @media (max-width: 480px) {
   .header-container {
-    padding: 0.75rem 1rem;
-  }
-
-  .brand-title {
-    font-size: 1.3rem;
+    padding: 0.5rem 1rem;
   }
 
   .brand-subtitle {
     font-size: 0.7rem;
   }
 
-  .logo-icon {
-    font-size: 1.8rem;
+  .logo-image {
+    width: 70px !important;
+    height: 70px !important;
+    min-width: 70px;
+    min-height: 70px;
+    max-width: 70px;
+    max-height: 70px;
   }
 
   .action-btn {

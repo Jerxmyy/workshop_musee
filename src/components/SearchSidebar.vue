@@ -171,44 +171,6 @@
         </div>
       </div>
 
-      <!-- Filtres avancés -->
-      <div class="advanced-filters">
-        <div class="filters-header">
-          <h3 class="filters-title">
-            <span class="title-icon">⚙️</span>
-            Filtres avancés
-          </h3>
-        </div>
-
-        <div class="filters-grid">
-          <label class="filter-option">
-            <input v-model="searchForm.freeEntry" type="checkbox" class="checkbox-input" />
-            <div class="checkbox-custom">
-              <div class="checkbox-check">✓</div>
-            </div>
-            <div class="option-content">
-              <span class="option-title">Entrée gratuite</span>
-              <span class="option-subtitle">Musées avec accès libre</span>
-            </div>
-          </label>
-
-          <label class="filter-option">
-            <input
-              v-model="searchForm.wheelchairAccessible"
-              type="checkbox"
-              class="checkbox-input"
-            />
-            <div class="checkbox-custom">
-              <div class="checkbox-check">✓</div>
-            </div>
-            <div class="option-content">
-              <span class="option-title">Accessible</span>
-              <span class="option-subtitle">Aux fauteuils roulants</span>
-            </div>
-          </label>
-        </div>
-      </div>
-
       <!-- Boutons d'action -->
       <div class="form-actions">
         <button type="submit" class="search-btn" :disabled="isLoading">
@@ -253,8 +215,6 @@ const searchForm = reactive({
   theme: '',
   latitude: null,
   longitude: null,
-  freeEntry: false,
-  wheelchairAccessible: false,
 })
 
 const handleSubmit = () => {
@@ -268,8 +228,6 @@ const handleSubmit = () => {
       searchForm.latitude && searchForm.longitude
         ? { lat: searchForm.latitude, lng: searchForm.longitude }
         : null,
-    freeEntry: searchForm.freeEntry,
-    wheelchairAccessible: searchForm.wheelchairAccessible,
   }
 
   emit('search', searchParams)
@@ -277,14 +235,12 @@ const handleSubmit = () => {
 
 const clearForm = () => {
   Object.keys(searchForm).forEach((key) => {
-    if (typeof searchForm[key] === 'boolean') {
-      searchForm[key] = false
+    if (key === 'latitude' || key === 'longitude') {
+      searchForm[key] = null
     } else {
       searchForm[key] = ''
     }
   })
-  searchForm.latitude = null
-  searchForm.longitude = null
 }
 
 const loadThemes = async () => {
@@ -501,10 +457,10 @@ onMounted(() => {
 /* main container */
 .search-sidebar {
   width: 100%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(45, 45, 45, 0.95) 0%, rgba(60, 60, 60, 0.95) 100%);
   backdrop-filter: blur(20px);
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   position: relative;
 }
@@ -516,7 +472,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+  background: linear-gradient(90deg, #007acc, #00a8ff, #007acc, #00a8ff);
   background-size: 300% 100%;
   animation: gradientShift 3s ease infinite;
 }
@@ -535,8 +491,8 @@ onMounted(() => {
 .search-header {
   text-align: center;
   padding: 1rem 1.5rem 0.75rem 1.5rem;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  background: linear-gradient(135deg, rgba(0, 122, 204, 0.1) 0%, rgba(0, 168, 255, 0.1) 100%);
+  border-bottom: 1px solid rgba(0, 122, 204, 0.2);
 }
 
 .search-icon {
@@ -559,9 +515,9 @@ onMounted(() => {
 .search-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #e5e5e5;
   margin: 0 0 0.25rem 0;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #007acc, #00a8ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -569,7 +525,7 @@ onMounted(() => {
 
 .search-subtitle {
   font-size: 0.8rem;
-  color: #7f8c8d;
+  color: #a0a0a0;
   margin: 0;
   font-weight: 400;
 }
@@ -618,7 +574,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #e5e5e5;
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
@@ -641,12 +597,12 @@ onMounted(() => {
 .form-select {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 2px solid rgba(102, 126, 234, 0.2);
+  border: 2px solid rgba(0, 122, 204, 0.3);
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 500;
-  color: #2c3e50;
-  background: rgba(255, 255, 255, 0.8);
+  color: #e5e5e5;
+  background: rgba(60, 60, 60, 0.8);
   backdrop-filter: blur(10px);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -656,14 +612,14 @@ onMounted(() => {
 .form-input:focus,
 .form-select:focus {
   outline: none;
-  border-color: #667eea;
-  background: white;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  border-color: #007acc;
+  background: rgba(70, 70, 70, 0.9);
+  box-shadow: 0 0 0 4px rgba(0, 122, 204, 0.2);
   transform: translateY(-2px);
 }
 
 .form-input::placeholder {
-  color: #a0aec0;
+  color: #888888;
   font-weight: 400;
 }
 
@@ -681,7 +637,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #007acc, #00a8ff);
   border-radius: 1px;
   transform: scaleX(0);
   transition: transform 0.3s ease;
@@ -698,7 +654,7 @@ onMounted(() => {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #667eea;
+  color: #007acc;
   font-size: 0.8rem;
   pointer-events: none;
   z-index: 3;
@@ -733,7 +689,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.5rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #007acc, #00a8ff);
   color: white;
   border: none;
   border-radius: 12px;
@@ -741,7 +697,7 @@ onMounted(() => {
   font-size: 0.9rem;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 122, 204, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -763,11 +719,11 @@ onMounted(() => {
 
 .location-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 122, 204, 0.4);
 }
 
 .location-btn:disabled {
-  background: #bdc3c7;
+  background: #666666;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -779,134 +735,6 @@ onMounted(() => {
 
 .btn-text {
   font-weight: 600;
-}
-
-/* Filtres avancés */
-.advanced-filters {
-  background: rgba(102, 126, 234, 0.03);
-  border-radius: 12px;
-  padding: 1rem;
-  border: 1px solid rgba(102, 126, 234, 0.1);
-}
-
-.filters-header {
-  margin-bottom: 1rem;
-}
-
-.filters-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2c3e50;
-  margin: 0;
-}
-
-.title-icon {
-  font-size: 1.2rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.filters-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-/* Options de filtre */
-.filter-option {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background: white;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 2px solid transparent;
-  position: relative;
-  overflow: hidden;
-}
-
-.filter-option::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.filter-option:hover::before {
-  opacity: 1;
-}
-
-.filter-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-  border-color: rgba(102, 126, 234, 0.2);
-}
-
-.checkbox-input {
-  display: none;
-}
-
-.checkbox-custom {
-  width: 24px;
-  height: 24px;
-  border: 2px solid #e1e8ed;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  z-index: 2;
-}
-
-.checkbox-check {
-  color: white;
-  font-size: 0.8rem;
-  font-weight: bold;
-  opacity: 0;
-  transform: scale(0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.checkbox-input:checked + .checkbox-custom {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-color: #667eea;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-}
-
-.checkbox-input:checked + .checkbox-custom .checkbox-check {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.option-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  position: relative;
-  z-index: 2;
-}
-
-.option-title {
-  font-weight: 600;
-  color: #2c3e50;
-  font-size: 0.95rem;
-}
-
-.option-subtitle {
-  font-size: 0.8rem;
-  color: #7f8c8d;
-  font-weight: 400;
 }
 
 /* Boutons d'action */
@@ -938,18 +766,18 @@ onMounted(() => {
 }
 
 .search-btn {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  background: linear-gradient(135deg, #007acc, #00a8ff);
   color: white;
-  box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 122, 204, 0.3);
 }
 
 .search-btn:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(39, 174, 96, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 122, 204, 0.4);
 }
 
 .search-btn:disabled {
-  background: #bdc3c7;
+  background: #666666;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
@@ -988,10 +816,6 @@ onMounted(() => {
   }
 
   .coordinates-inputs {
-    grid-template-columns: 1fr;
-  }
-
-  .filters-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -1051,14 +875,6 @@ onMounted(() => {
 
   .primary-input {
     padding: 1rem 1.25rem;
-  }
-
-  .advanced-filters {
-    padding: 1rem;
-  }
-
-  .filter-option {
-    padding: 0.75rem;
   }
 }
 </style>

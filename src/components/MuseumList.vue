@@ -205,8 +205,8 @@ const truncateText = (text, maxLength) => {
 .loading-spinner {
   width: 50px;
   height: 50px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border: 4px solid #404040;
+  border-top: 4px solid #007acc;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -222,7 +222,7 @@ const truncateText = (text, maxLength) => {
 
 .loading-text {
   font-size: 1.1rem;
-  color: #7f8c8d;
+  color: #a0a0a0;
 }
 
 .empty-state {
@@ -242,12 +242,12 @@ const truncateText = (text, maxLength) => {
 
 .empty-title {
   font-size: 1.5rem;
-  color: #2c3e50;
+  color: #e5e5e5;
   margin: 0;
 }
 
 .empty-description {
-  color: #7f8c8d;
+  color: #a0a0a0;
   font-size: 1rem;
   max-width: 400px;
 }
@@ -260,9 +260,10 @@ const truncateText = (text, maxLength) => {
 }
 
 .museum-card {
-  background: white;
+  background: #2d2d2d;
+  border: 1px solid #404040;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   overflow: hidden;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -272,7 +273,8 @@ const truncateText = (text, maxLength) => {
 
 .museum-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  border-color: #555555;
 }
 
 .museum-image {
@@ -290,7 +292,7 @@ const truncateText = (text, maxLength) => {
 .placeholder-image {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #404040 0%, #555555 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -313,13 +315,13 @@ const truncateText = (text, maxLength) => {
 .museum-name {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #ffffff;
   margin: 0;
   line-height: 1.3;
 }
 
 .museum-location {
-  color: #7f8c8d;
+  color: #c0c0c0;
   font-size: 0.95rem;
   margin: 0;
   display: flex;
@@ -338,8 +340,8 @@ const truncateText = (text, maxLength) => {
 }
 
 .theme-tag {
-  background: #e8f4fd;
-  color: #2980b9;
+  background: #404040;
+  color: #007acc;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -347,7 +349,7 @@ const truncateText = (text, maxLength) => {
 }
 
 .museum-description {
-  color: #5d6d7e;
+  color: #d0d0d0;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
@@ -359,6 +361,7 @@ const truncateText = (text, maxLength) => {
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: auto;
+  color: #c0c0c0;
 }
 
 .meta-item {
@@ -366,7 +369,7 @@ const truncateText = (text, maxLength) => {
   align-items: center;
   gap: 0.25rem;
   font-size: 0.85rem;
-  color: #7f8c8d;
+  color: #c0c0c0;
 }
 
 .meta-icon {
@@ -375,14 +378,14 @@ const truncateText = (text, maxLength) => {
 
 .museum-actions {
   padding: 1rem 1.5rem;
-  border-top: 1px solid #ecf0f1;
-  background: #f8f9fa;
+  border-top: 1px solid #555555;
+  background: #2d2d2d;
 }
 
 .view-btn {
   width: 100%;
   padding: 0.75rem;
-  background: #3498db;
+  background: #007acc;
   color: white;
   border: none;
   border-radius: 8px;
@@ -396,7 +399,7 @@ const truncateText = (text, maxLength) => {
 }
 
 .view-btn:hover {
-  background: #2980b9;
+  background: #0056b3;
 }
 
 .btn-icon {
@@ -420,7 +423,7 @@ const truncateText = (text, maxLength) => {
 
 .pagination-btn {
   padding: 0.75rem 1.5rem;
-  background: #3498db;
+  background: #007acc;
   color: white;
   border: none;
   border-radius: 8px;
@@ -435,12 +438,12 @@ const truncateText = (text, maxLength) => {
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #2980b9;
+  background: #0056b3;
   transform: translateY(-1px);
 }
 
 .pagination-btn:disabled {
-  background: #bdc3c7;
+  background: #666666;
   cursor: not-allowed;
   transform: none;
 }
@@ -453,8 +456,8 @@ const truncateText = (text, maxLength) => {
 
 .pagination-number {
   padding: 0.5rem 0.75rem;
-  background: #ecf0f1;
-  color: #2c3e50;
+  background: #404040;
+  color: #e5e5e5;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -468,21 +471,21 @@ const truncateText = (text, maxLength) => {
 }
 
 .pagination-number:hover {
-  background: #d5dbdb;
+  background: #555555;
   transform: translateY(-1px);
 }
 
 .pagination-number.active {
-  background: #3498db;
+  background: #007acc;
   color: white;
 }
 
 .pagination-number.active:hover {
-  background: #2980b9;
+  background: #0056b3;
 }
 
 .pagination-info {
-  color: #7f8c8d;
+  color: #a0a0a0;
   font-weight: 500;
   text-align: center;
   margin-top: 1rem;
@@ -491,7 +494,7 @@ const truncateText = (text, maxLength) => {
 
 .pagination-count {
   font-size: 0.9rem;
-  color: #95a5a6;
+  color: #888888;
 }
 
 @media (max-width: 768px) {
