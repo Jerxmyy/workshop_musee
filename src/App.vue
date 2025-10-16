@@ -1,13 +1,16 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useMuseumStore } from './stores/museum'
+import { useAuthStore } from './stores/auth'
 import SearchSidebar from './components/SearchSidebar.vue'
 import MuseumList from './components/MuseumList.vue'
 import MuseumDetail from './components/MuseumDetail.vue'
 import FavoritesPage from './components/FavoritesPage.vue'
+import LoginPage from './components/LoginPage.vue'
 import ErrorMessage from './components/ErrorMessage.vue'
 
 const museumStore = useMuseumStore()
+const authStore = useAuthStore()
 
 const selectedMuseum = computed(() => museumStore.selectedMuseum)
 const searchResults = computed(() => museumStore.museums)
@@ -16,8 +19,12 @@ const totalCount = computed(() => museumStore.totalCount)
 const error = computed(() => museumStore.error)
 const favoritesCount = computed(() => museumStore.favorites.length)
 
+// État d'authentification
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+const currentUser = computed(() => authStore.userInfo)
+
 // navigation state
-const currentPage = ref('search') // 'search' ou 'favorites'
+const currentPage = ref('search') // 'search', 'favorites', ou 'login'
 
 const handleSearch = async (params) => {
   await museumStore.searchMuseums(params)
@@ -56,8 +63,31 @@ const goToSearch = () => {
 }
 
 const goToAccount = () => {
-  // TODO: implement account page
-  alert('Gestion des comptes - Fonctionnalité à venir !')
+  currentPage.value = 'login' // La page login devient la page compte quand connecté
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
+const goToRegister = () => {
+  // TODO: implement register page
+  alert("Page d'inscription - Fonctionnalité à venir !")
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
+const handleLoginSuccess = () => {
+  currentPage.value = 'search'
+}
+
+const handleLogout = async () => {
+  await authStore.logout()
+  currentPage.value = 'search'
+  isMobileMenuOpen.value = false
+  isFiltersOpen.value = false
+}
+
+const handleLogoutSuccess = () => {
+  currentPage.value = 'search'
   isMobileMenuOpen.value = false
   isFiltersOpen.value = false
 }
@@ -82,7 +112,10 @@ const handleScroll = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Initialiser l'authentification
+  await authStore.initializeAuth()
+
   // load some museums on startup
   museumStore.searchMuseums()
 
@@ -135,12 +168,22 @@ onUnmounted(() => {
           </div>
           <div class="nav-item" @click="goToAccount">
             <span class="nav-icon">👤</span>
-            <span class="nav-text">Compte</span>
+            <span class="nav-text">{{ isAuthenticated ? 'Compte' : 'Connexion' }}</span>
           </div>
         </nav>
 
         <!-- Actions Section -->
         <div class="header-actions">
+          <!-- Logout Icon (Desktop) -->
+          <button
+            v-if="isAuthenticated"
+            @click="handleLogout"
+            class="logout-icon-btn desktop-only"
+            title="Se déconnecter"
+          >
+            <span class="btn-icon">🚪</span>
+          </button>
+
           <!-- Search Button -->
           <button
             @click="toggleFilters"
@@ -203,7 +246,11 @@ onUnmounted(() => {
             </div>
             <div class="mobile-nav-item" @click="goToAccount">
               <span class="nav-icon">👤</span>
-              <span class="nav-text">Compte</span>
+              <span class="nav-text">{{ isAuthenticated ? 'Compte' : 'Connexion' }}</span>
+            </div>
+            <div v-if="isAuthenticated" class="mobile-nav-item logout-item" @click="handleLogout">
+              <span class="nav-icon">🚪</span>
+              <span class="nav-text">Déconnexion</span>
             </div>
           </div>
 
@@ -215,7 +262,13 @@ onUnmounted(() => {
     <!-- Contenu principal -->
     <div class="main-content" :class="{ 'search-open': isFiltersOpen }">
       <div class="results-section">
-        <MuseumDetail v-if="selectedMuseum" :museum="selectedMuseum" @back="backToList" />
+        <LoginPage
+          v-if="currentPage === 'login'"
+          @go-to-register="goToRegister"
+          @login-success="handleLoginSuccess"
+          @logout-success="handleLogoutSuccess"
+        />
+        <MuseumDetail v-else-if="selectedMuseum" :museum="selectedMuseum" @back="backToList" />
         <FavoritesPage
           v-else-if="currentPage === 'favorites'"
           @select-museum="selectMuseum"
@@ -377,6 +430,33 @@ onUnmounted(() => {
   gap: 1rem;
   grid-column: 3;
   justify-self: end;
+}
+
+/* Logout Icon Button */
+.logout-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.logout-icon-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.logout-icon-btn .btn-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .action-btn {
@@ -660,6 +740,23 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
 }
 
+.mobile-nav-item.logout-item {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border-color: #c0392b;
+}
+
+.mobile-nav-item.logout-item:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.mobile-nav-item.logout-item .nav-text {
+  color: white;
+  font-weight: 600;
+}
+
 .mobile-overlay {
   position: fixed;
   top: 0;
@@ -678,88 +775,5 @@ onUnmounted(() => {
 
 .mobile-only {
   display: none;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .header-container {
-    grid-template-columns: 1fr auto 1fr;
-  }
-
-  .header-nav {
-    display: flex;
-    flex-direction: row;
-    gap: 1.2rem;
-    grid-column: 2;
-    flex-wrap: nowrap;
-  }
-
-  .nav-item {
-    display: inline-flex;
-    flex-direction: row;
-    padding: 0.5rem 1rem;
-  }
-
-  .nav-text {
-    display: none;
-  }
-
-  .header-brand {
-    min-width: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
-
-  .mobile-only {
-    display: block;
-  }
-
-  .header-container {
-    padding: 0.5rem 1.5rem;
-  }
-
-  .brand-subtitle {
-    font-size: 0.75rem;
-  }
-
-  .logo-image {
-    width: 90px !important;
-    height: 90px !important;
-    min-width: 90px;
-    min-height: 90px;
-    max-width: 90px;
-    max-height: 90px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header-container {
-    padding: 0.5rem 1rem;
-  }
-
-  .brand-subtitle {
-    font-size: 0.7rem;
-  }
-
-  .logo-image {
-    width: 70px !important;
-    height: 70px !important;
-    min-width: 70px;
-    min-height: 70px;
-    max-width: 70px;
-    max-height: 70px;
-  }
-
-  .action-btn {
-    padding: 0.5rem 1rem;
-  }
-
-  .mobile-menu-content {
-    padding: 5rem 1rem 1.5rem 1rem;
-  }
 }
 </style>

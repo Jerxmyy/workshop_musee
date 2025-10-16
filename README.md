@@ -6,16 +6,14 @@ Une application Vue.js moderne et responsive pour découvrir et explorer les tr�
 
 ### 🔍 Recherche avancée
 
-- **Recherche textuelle** : Par nom de musée ou description
-- **Filtres géographiques** : Par région et ville
+- **Recherche textuelle** : Par nom du musée / de la ville / de la région / du département / de la thématique
+- **Filtres géographiques** : Par régions / départements / villes
 - **Filtres thématiques** : Art, Histoire, Sciences, Archéologie, etc.
 - **Recherche par localisation** : Utilisation de la géolocalisation
-- **Filtres d'accessibilité** : Entrée gratuite, accessibilité PMR
 
 ### 🎨 Interface utilisateur
 
 - **Design responsive** : Adapté à tous les écrans (mobile, tablette, desktop)
-- **Interface plein écran** : Utilise tout l'espace disponible
 - **Design moderne** : Interface élégante avec dégradés et animations
 - **Navigation intuitive** : Recherche, liste, détails et carte
 
@@ -98,7 +96,17 @@ src/
 │   ├── SearchSidebar.vue    # Barre latérale de recherche
 │   ├── MuseumList.vue       # Liste des musées
 │   ├── MuseumDetail.vue     # Fiche détaillée d'un musée
-│   └── ErrorMessage.vue     # Composant d'erreur
+│   ├── FavoritesPage.vue    # Page des favoris
+│   ├── ErrorMessage.vue     # Composant d'erreur
+│   ├── HelloWorld.vue       # Composant d'accueil
+│   ├── TheWelcome.vue       # Composant de bienvenue
+│   ├── WelcomeItem.vue      # Élément de bienvenue
+│   └── icons/               # Icônes personnalisées
+│       ├── IconCommunity.vue
+│       ├── IconDocumentation.vue
+│       ├── IconEcosystem.vue
+│       ├── IconSupport.vue
+│       └── IconTooling.vue
 ├── stores/              # Stores Pinia
 │   └── museum.js            # Store principal des musées
 ├── services/            # Services API
@@ -118,7 +126,7 @@ L'application utilise l'API Muséofile du Ministère de la Culture accessible vi
 
 ### Endpoints utilisés
 
-- **Recherche de musées** : `GET /api/records/1.0/search/`
+- **Recherche de musées** : `GET /api/records/2.1/search/`
 - **Dataset** : `musees-de-france`
 
 ### Paramètres de recherche
@@ -133,8 +141,6 @@ L'application utilise l'API Muséofile du Ministère de la Culture accessible vi
     lat: number,
     lng: number
   },
-  freeEntry: boolean,    // Entrée gratuite
-  wheelchairAccessible: boolean, // Accessible PMR
   page: number,          // Page (pagination)
   rows: number          // Nombre de résultats par page
 }
@@ -147,19 +153,12 @@ const response = await museofileApi.searchMuseums({
   text: 'Louvre',
   region: 'Île-de-France',
   theme: 'Art',
-  freeEntry: false,
   page: 0,
   rows: 20,
 })
 ```
 
-## 🎨 Design et Responsive
-
-### Breakpoints
-
-- **Mobile** : < 480px
-- **Tablette** : 480px - 768px
-- **Desktop** : > 768px
+## 🎨 Design
 
 ### Caractéristiques du design
 
@@ -218,35 +217,35 @@ npm run build
 ### Défis rencontrés
 
 1. **API Muséofile** : Documentation limitée, nécessité d'analyser la structure des données
-2. **Responsive design** : Adaptation complexe pour l'interface plein écran
-3. **Gestion d'état** : Coordination entre recherche, pagination et favoris
-4. **Performance** : Optimisation des requêtes API et du rendu des listes
+2. **Récupération des filtres** : La lisibilité de l'API était compliquée, nécessitant de vérifier à plusieurs reprises si les requêtes étaient correctes. La structure des paramètres de filtrage n'était pas intuitive et demandait beaucoup de tests pour comprendre les formats attendus
+3. **Responsive design** : Adaptation complexe pour l'interface plein écran
+4. **Gestion d'état** : Coordination entre recherche, pagination et favoris
+5. **Performance** : Optimisation des requêtes API et du rendu des listes
 
 ### Solutions apportées
 
 1. **Service API robuste** : Gestion d'erreurs et fallback sur données de test
-2. **CSS Grid et Flexbox** : Layout responsive adaptatif
-3. **Pinia** : Gestion d'état centralisée et réactive
-4. **Lazy loading** : Chargement optimisé des composants
+2. **Tests itératifs des requêtes** : Validation systématique des paramètres de filtrage par des tests répétés pour s'assurer de la conformité avec l'API
+3. **CSS Grid et Flexbox** : Layout responsive adaptatif
+4. **Pinia** : Gestion d'état centralisée et réactive
+5. **Lazy loading** : Chargement optimisé des composants
 
 ### Améliorations futures
 
-- [ ] Authentification utilisateur
-- [ ] API backend pour les favoris
-- [ ] Cache des données
-- [ ] Mode hors ligne
-- [ ] Tests unitaires
-- [ ] PWA (Progressive Web App)
+- [ ] **Intégration avis Google** : Récupération des notes et avis Google réels pour remplacer les notes aléatoires actuelles
+- [ ] **Informations tarifaires** : Affichage des tarifs d'entrée et des options de gratuité
+- [ ] **Accessibilité PMR** : Intégration des informations d'accessibilité pour personnes à mobilité réduite afin d'aider les utilisateurs à choisir des musées adaptés à leurs besoins
+- [ ] **Responsive Design** : Adapter l'interface pour une utilisation agréable sur format tablette et téléphone
 
 ## 📝 Licence
 
-Ce projet est développé dans le cadre d'un workshop sur l'utilisation des APIs Open Data du Ministère de la Culture.
+Ce projet est développé dans le cadre de ma formation à l'ESD Paris, lors d'un workshop sur l'utilisation des APIs Open Data du Ministère de la Culture.
 
 ## 👥 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à :
 
-1. Fork le projet
+1. Dupliquer le projet sur votre compte GitHub
 2. Créer une branche feature
 3. Commiter vos changements
 4. Pousser vers la branche
@@ -254,4 +253,4 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 
 ## 📞 Contact
 
-Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub.
+Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub ou à m'envoyer un mail a l'adresse suivante : jeremy.chambon@mail-esd.com .
