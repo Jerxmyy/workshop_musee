@@ -68,12 +68,12 @@ const goToAccount = () => {
   isFiltersOpen.value = false
 }
 
-const goToRegister = () => {
-  // TODO: implement register page
-  alert("Page d'inscription - Fonctionnalité à venir !")
-  isMobileMenuOpen.value = false
-  isFiltersOpen.value = false
-}
+// const goToRegister = () => {
+//   // TODO: implement register page
+//   alert("Page d'inscription - Fonctionnalité à venir !")
+//   isMobileMenuOpen.value = false
+//   isFiltersOpen.value = false
+// }
 
 const handleLoginSuccess = () => {
   currentPage.value = 'search'

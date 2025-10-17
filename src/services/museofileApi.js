@@ -101,11 +101,6 @@ class MuseofileApiService {
     return conditions.length > 0 ? conditions.join(' AND ') : undefined
   }
 
-  /**
-   * Transforme un enregistrement de l'API v2.1 en objet musée
-   * @param {Object} record - Enregistrement de l'API
-   * @returns {Object} Objet musée transformé
-   */
   transformApiRecord(record) {
     return {
       id: record.identifiant || `museum-${Date.now()}-${Math.random()}`,
@@ -156,11 +151,10 @@ class MuseofileApiService {
     return images[Math.floor(Math.random() * images.length)]
   }
 
-  /**
-   * Mappe les thématiques simples vers les valeurs API v2.1
-   * @param {string} simpleTheme - Thématique simple
-   * @returns {string} Valeur API correspondante
-   */
+  // Mappe les thématiques simples vers les valeurs API v2.1
+  // @param {string} simpleTheme - Thématique simple
+  // @returns {string} Valeur API correspondante
+  //
   getThemeMapping(simpleTheme) {
     const themeMappings = {
       Art: 'Beaux-Arts',
@@ -174,11 +168,11 @@ class MuseofileApiService {
     return themeMappings[simpleTheme] || null
   }
 
-  /**
-   * Récupère un musée par son ID
-   * @param {string} museumId - ID du musée
-   * @returns {Promise<Object>} Données du musée
-   */
+  //
+  // Récupère un musée par son ID
+  // @param {string} museumId - ID du musée
+  // @returns {Promise<Object>} Données du musée
+  //
   async getMuseumById(museumId) {
     try {
       const response = await this.client.get('/records', {
@@ -214,7 +208,7 @@ class MuseofileApiService {
         params: {
           select:
             'nom_officiel,adresse,lieu,code_postal,ville,region,departement,url,categorie,domaine_thematique,histoire,atout,personnage_phare,interet,protection_batiment,protection_espace,annee_creation,date_de_mise_a_jour,coordonnees',
-          where: `distance(coordonnees, ${lat}, ${lng}) < ${radius * 1000}`,
+          where: `distance(coordonnees, ${lat}, ${lng}) < ${radius * 10}`,
           limit: 100,
         },
       })

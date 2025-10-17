@@ -44,21 +44,6 @@
           <p class="museum-description">
             {{ truncateText(museum.description, 120) }}
           </p>
-
-          <div class="museum-meta">
-            <div class="meta-item" v-if="museum.freeEntry">
-              <span class="meta-icon">🆓</span>
-              <span class="meta-text">Entrée gratuite</span>
-            </div>
-            <div class="meta-item" v-if="museum.wheelchairAccessible">
-              <span class="meta-icon">♿</span>
-              <span class="meta-text">Accessible</span>
-            </div>
-            <div class="meta-item" v-if="museum.rating">
-              <span class="meta-icon">⭐</span>
-              <span class="meta-text">{{ museum.rating }}/5</span>
-            </div>
-          </div>
         </div>
 
         <div class="museum-actions">
