@@ -30,6 +30,66 @@ Une application Vue.js moderne et responsive pour découvrir et explorer les tr�
 - **Persistance** : Sauvegarde dans le localStorage
 - **Partage** : Fonctionnalité de partage des musées
 
+### 🔐 Authentification
+
+- **Connexion/Inscription** : Système d'authentification complet
+- **Gestion de profil** : Informations utilisateur
+- **Sécurité** : Tokens d'accès et gestion des sessions
+
+## 🏗️ Architecture de l'application
+
+```mermaid
+graph TB
+    subgraph "Frontend Vue.js"
+        A[App.vue] --> B[SearchSidebar.vue]
+        A --> C[MuseumList.vue]
+        A --> D[MuseumDetail.vue]
+        A --> E[FavoritesPage.vue]
+        A --> F[LoginPage.vue]
+        A --> G[ErrorMessage.vue]
+
+        subgraph "Stores Pinia"
+            H[MuseumStore]
+            I[AuthStore]
+        end
+
+        subgraph "Services"
+            J[MuseofileApiService]
+            K[AuthApiService]
+        end
+
+        A --> H
+        A --> I
+        H --> J
+        I --> K
+    end
+
+    subgraph "API Externes"
+        L[API Muséofile<br/>data.culture.gouv.fr]
+        M[OpenStreetMap<br/>Cartes]
+        N[API d'authentification<br/>Backend personnalisé]
+    end
+
+    subgraph "Stockage Local"
+        O[localStorage<br/>Favoris & Tokens]
+    end
+
+    J --> L
+    J --> M
+    K --> N
+    H --> O
+    I --> O
+
+    subgraph "Flux de données"
+        P[Recherche] --> Q[Filtres]
+        Q --> R[API Call]
+        R --> S[Résultats]
+        S --> T[Affichage]
+        T --> U[Actions utilisateur]
+        U --> V[État mis à jour]
+    end
+```
+
 ## 🛠️ Technologies utilisées
 
 ### Frontend
@@ -57,7 +117,7 @@ Une application Vue.js moderne et responsive pour découvrir et explorer les tr�
 
 ```bash
 # Cloner le repository
-git clone <https://github.com/Jerxmyy/workshop_musee>
+git clone https://github.com/Jerxmyy/workshop_musee
 cd workshop-musee
 
 # Installer les dépendances
@@ -97,6 +157,7 @@ src/
 │   ├── MuseumList.vue       # Liste des musées
 │   ├── MuseumDetail.vue     # Fiche détaillée d'un musée
 │   ├── FavoritesPage.vue    # Page des favoris
+│   ├── LoginPage.vue        # Page de connexion/inscription
 │   ├── ErrorMessage.vue     # Composant d'erreur
 │   ├── HelloWorld.vue       # Composant d'accueil
 │   ├── TheWelcome.vue       # Composant de bienvenue
@@ -108,9 +169,11 @@ src/
 │       ├── IconSupport.vue
 │       └── IconTooling.vue
 ├── stores/              # Stores Pinia
-│   └── museum.js            # Store principal des musées
+│   ├── museum.js            # Store principal des musées
+│   └── auth.js              # Store d'authentification
 ├── services/            # Services API
-│   └── museofileApi.js      # Service API Muséofile
+│   ├── museofileApi.js      # Service API Muséofile
+│   └── authApi.js           # Service API d'authentification
 ├── assets/              # Ressources statiques
 │   ├── main.css             # Styles principaux
 │   └── base.css             # Styles de base
@@ -218,17 +281,17 @@ npm run build
 
 1. **API Muséofile** : Documentation limitée, nécessité d'analyser la structure des données
 2. **Récupération des filtres** : La lisibilité de l'API était compliquée, nécessitant de vérifier à plusieurs reprises si les requêtes étaient correctes. La structure des paramètres de filtrage n'était pas intuitive et demandait beaucoup de tests pour comprendre les formats attendus
-3. **Responsive design** : Adaptation complexe pour l'interface plein écran
-4. **Gestion d'état** : Coordination entre recherche, pagination et favoris
-5. **Performance** : Optimisation des requêtes API et du rendu des listes
+3. **Gestion d'état** : Coordination entre recherche, pagination et favoris
+4. **Performance** : Optimisation des requêtes API et du rendu des listes
+5. **Authentification** : Intégration d'un système d'authentification complet avec gestion des tokens
 
 ### Solutions apportées
 
 1. **Service API robuste** : Gestion d'erreurs et fallback sur données de test
 2. **Tests itératifs des requêtes** : Validation systématique des paramètres de filtrage par des tests répétés pour s'assurer de la conformité avec l'API
-3. **CSS Grid et Flexbox** : Layout responsive adaptatif
-4. **Pinia** : Gestion d'état centralisée et réactive
-5. **Lazy loading** : Chargement optimisé des composants
+3. **Pinia** : Gestion d'état centralisée et réactive
+4. **Lazy loading** : Chargement optimisé des composants
+5. **Stores séparés** : Séparation claire entre logique métier (musées) et authentification
 
 ### Améliorations futures
 
@@ -236,10 +299,24 @@ npm run build
 - [ ] **Informations tarifaires** : Affichage des tarifs d'entrée et des options de gratuité
 - [ ] **Accessibilité PMR** : Intégration des informations d'accessibilité pour personnes à mobilité réduite afin d'aider les utilisateurs à choisir des musées adaptés à leurs besoins
 - [ ] **Responsive Design** : Adapter l'interface pour une utilisation agréable sur format tablette et téléphone
+- [ ] **Notifications push** : Système de notifications pour les nouveaux musées ou événements
+- [ ] **Partage social** : Intégration des réseaux sociaux pour partager les musées favoris
 
-## 📝 Licence
+- [ ] **Enregistrement des favoris** : Intégration des favoris dans la BDD pour pouvoir correctement les lier aux profils
 
-Ce projet est développé dans le cadre de ma formation à l'ESD Paris, lors d'un workshop sur l'utilisation des APIs Open Data du Ministère de la Culture.
+## 🎯 Démonstration
+
+Pour une démonstration complète de l'application :
+
+1. **Recherche** : Montrer les différents filtres (texte, région, thématique)
+2. **Navigation** : Parcourir la liste et les détails d'un musée
+3. **Favoris** : Ajouter/supprimer des musées favoris
+4. **Authentification** : Connexion et gestion de profil
+5. **Responsive** : Tester sur différentes tailles d'écran
+
+## 📝 Contexte
+
+Ce projet a été développé dans le cadre de ma formation à l'ESD Paris, lors d'un workshop API sur l'utilisation des APIs Open Data du Ministère de la Culture.
 
 ## 👥 Contribution
 
@@ -253,4 +330,4 @@ Les contributions sont les bienvenues ! N'hésitez pas à :
 
 ## 📞 Contact
 
-Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub ou à m'envoyer un mail a l'adresse suivante : jeremy.chambon@mail-esd.com .
+Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue sur GitHub ou à m'envoyer un mail à l'adresse suivante : jeremy.chambon@mail-esd.com
